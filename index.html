@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Melody Yang — Business Systems Analyst</title>
+<meta name="description" content="Business systems analyst. Intake, workflow, and reporting systems built for regulated operations.">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23B5763A'/%3E%3Ctext x='32' y='43' font-family='Arial, Helvetica, sans-serif' font-weight='700' font-size='30' fill='%23FFFFFF' text-anchor='middle'%3EMY%3C/text%3E%3C/svg%3E">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Melody Yang">
+<meta property="og:title" content="Melody Yang — Business Systems Analyst">
+<meta property="og:description" content="Business systems analyst. Intake, workflow, and reporting systems built for regulated operations.">
+<meta property="og:url" content="https://melodyyangds.github.io/">
+<meta property="og:image" content="https://melodyyangds.github.io/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Melody Yang — Business Systems Analyst">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Melody Yang — Business Systems Analyst">
+<meta name="twitter:description" content="Business systems analyst. Intake, workflow, and reporting systems built for regulated operations.">
+<meta name="twitter:image" content="https://melodyyangds.github.io/og-image.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#B5763A;
+    --primary-deep:#7A4E1E;
+    --sand:#F8E7C8;
+    --sand-soft:#FCF3E2;
+    --plum:#7A4A6B;
+    --teal:#16786A;
+    --amber:#C08A2E;
+    --coral:#FF5C39;
+    --coral-deep:#D8401E;
+    --ink:#2F271B;
+    --ink-2:#6B6152;
+    --ink-3:#9A9184;
+    --paper:#FFFFFF;
+    --tint:#FBF3E4;
+    --rule:#E9DDC7;
+    --measure:64ch;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    *{transition:none !important;}
+  }
+
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Newsreader",Georgia,serif;
+    font-size:17.5px;
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3,h4,.ui{
+    font-family:"Archivo","Helvetica Neue",Arial,sans-serif;
+    font-weight:700;
+    letter-spacing:-0.025em;
+    line-height:1.08;
+    margin:0;
+  }
+
+  a{color:inherit;}
+  :focus-visible{outline:3px solid var(--primary);outline-offset:3px;}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:0 30px;}
+
+  /* ================= hero block ================= */
+  .top{
+    background:var(--sand);
+    color:var(--ink);
+    background-image:radial-gradient(circle at 92% 4%, rgba(255,255,255,.75), transparent 48%),
+                     radial-gradient(circle at 0% 100%, rgba(181,118,58,.20), transparent 54%);
+  }
+  .topbar .wrap{
+    display:flex;align-items:baseline;justify-content:space-between;gap:24px;
+    padding-top:20px;padding-bottom:20px;
+  }
+  .mark{font-family:"Archivo",sans-serif;font-weight:800;font-size:1rem;}
+  .topnav{display:flex;gap:24px;font-family:"Archivo",sans-serif;font-size:.85rem;font-weight:500;}
+  .topnav a{text-decoration:none;color:var(--ink-2);}
+  .topnav a:hover{color:var(--primary);}
+  @media (max-width:660px){.topnav{display:none;}}
+
+  .hero .wrap{
+    display:grid;
+    grid-template-columns:minmax(0,1.5fr) minmax(280px,.8fr);
+    gap:60px;align-items:start;
+    padding-top:72px;padding-bottom:88px;
+  }
+  h1{
+    font-size:clamp(2.7rem,7vw,4.9rem);
+    font-weight:800;letter-spacing:-0.04em;max-width:15ch;
+  }
+  .hero-sub{
+    margin:28px 0 0;font-size:1.25rem;line-height:1.5;
+    max-width:44ch;color:var(--ink-2);
+  }
+  .hero-actions{margin-top:36px;display:flex;flex-wrap:wrap;gap:12px;}
+  .btn{
+    font-family:"Archivo",sans-serif;font-size:.92rem;font-weight:600;
+    text-decoration:none;padding:13px 24px;border-radius:4px;
+    background:var(--coral);color:#fff;border:2px solid var(--coral);
+    transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .btn:hover{background:var(--coral-deep);border-color:var(--coral-deep);}
+  .btn-quiet{background:transparent;color:var(--ink);border-color:rgba(47,39,27,.3);}
+  .btn-quiet:hover{background:#fff;color:var(--primary);border-color:#fff;}
+
+  .record{background:#fff;color:var(--ink);border-radius:6px;border:1px solid var(--rule);box-shadow:0 10px 26px rgba(122,78,30,.13);}
+  .record-head{
+    padding:14px 20px;border-bottom:1px solid var(--rule);
+    font-family:"Archivo",sans-serif;font-size:.79rem;font-weight:600;color:var(--ink-3);
+    display:flex;justify-content:space-between;gap:12px;
+  }
+  .record dl{margin:0;padding:8px 20px 20px;}
+  .record dt{font-family:"Archivo",sans-serif;font-size:.75rem;font-weight:500;color:var(--ink-3);margin-top:15px;}
+  .record dd{margin:3px 0 0;font-size:1rem;line-height:1.4;}
+  .status{display:inline-flex;align-items:center;gap:8px;font-family:"Archivo",sans-serif;font-weight:700;color:var(--teal);}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--teal);flex:none;}
+
+  @media (max-width:900px){
+    .hero .wrap{grid-template-columns:1fr;gap:40px;padding-top:52px;padding-bottom:60px;}
+  }
+
+  /* ================= sections ================= */
+  section{border-top:1px solid var(--rule);}
+  .sec-inner{padding:72px 0;}
+  h2{font-size:1.05rem;font-weight:700;color:var(--primary);margin-bottom:36px;}
+  .lede{font-size:1.38rem;line-height:1.45;max-width:44ch;margin:0 0 26px;font-weight:400;}
+  p{max-width:var(--measure);}
+  .prose p{margin:0 0 20px;}
+  .prose p:last-child{margin-bottom:0;}
+
+  /* capabilities */
+  .caps{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:34px 44px;}
+  .cap{border-top:3px solid var(--primary);padding-top:16px;}
+  .cap:nth-child(3n+2){border-color:var(--plum);}
+  .cap:nth-child(3n+3){border-color:var(--teal);}
+  .cap h3{font-size:1.02rem;margin-bottom:9px;}
+  .cap p{margin:0;font-size:1rem;color:var(--ink-2);line-height:1.55;}
+
+  /* ================= work ================= */
+  .entry{padding:56px 0;border-bottom:1px solid var(--rule);--c:var(--primary);}
+  .entry:first-of-type{padding-top:0;}
+  .entry:last-of-type{border-bottom:0;padding-bottom:0;}
+  .entry.c-plum{--c:var(--plum);}
+  .entry.c-teal{--c:var(--teal);}
+
+  .entry-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:10px;}
+  .entry h3{font-size:1.7rem;max-width:24ch;}
+  .outcome{
+    font-family:"Archivo",sans-serif;font-size:.88rem;font-weight:700;
+    color:#fff;background:var(--coral);padding:6px 13px;border-radius:100px;white-space:nowrap;
+  }
+  .hook{font-size:1.12rem;color:var(--ink-2);margin:0 0 30px;max-width:58ch;}
+
+  .figure{
+    background:var(--tint);
+    border-radius:8px;padding:26px 26px 18px;margin:0 0 32px;
+  }
+  .figure svg{display:block;width:100%;height:auto;}
+  .figure figcaption{
+    font-family:"Archivo",sans-serif;font-size:.76rem;color:var(--ink-3);
+    margin-top:14px;
+  }
+  .svg-label{font-family:"Archivo",sans-serif;font-size:12px;font-weight:600;fill:var(--ink);}
+  .svg-small{font-family:"Archivo",sans-serif;font-size:10.5px;font-weight:500;fill:var(--ink-3);}
+  .svg-white{font-family:"Archivo",sans-serif;font-size:12px;font-weight:600;fill:#fff;}
+
+  .rows{display:grid;grid-template-columns:110px minmax(0,1fr);gap:4px 30px;}
+  .rows dt{font-family:"Archivo",sans-serif;font-size:.79rem;font-weight:600;color:var(--c);padding-top:5px;}
+  .rows dd{margin:0 0 18px;max-width:62ch;}
+  .rows dd:last-of-type{margin-bottom:0;}
+
+  .tags{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px;}
+  .tag{
+    font-family:"Archivo",sans-serif;font-size:.77rem;font-weight:600;
+    color:var(--c);background:var(--tint);border-radius:100px;padding:5px 12px;
+  }
+
+  @media (max-width:700px){
+    .rows{grid-template-columns:1fr;gap:0;}
+    .rows dt{padding-top:0;margin-bottom:3px;}
+    .rows dd{margin-bottom:20px;}
+    .entry h3{font-size:1.35rem;}
+    .figure{padding:18px 16px 14px;}
+  }
+
+  /* systems + education */
+  .sys{display:grid;grid-template-columns:160px minmax(0,1fr);gap:2px 30px;}
+  .sys dt{font-family:"Archivo",sans-serif;font-size:.82rem;font-weight:600;color:var(--primary);padding-top:5px;}
+  .sys dd{margin:0 0 20px;max-width:60ch;}
+  @media (max-width:700px){.sys{grid-template-columns:1fr;}.sys dd{margin-bottom:22px;}}
+
+  .creds{list-style:none;margin:0;padding:0;max-width:var(--measure);}
+  .creds li{padding:16px 0;border-bottom:1px solid var(--rule);}
+  .creds li:last-child{border-bottom:0;}
+  .creds strong{font-weight:500;}
+  .creds span{color:var(--ink-3);display:block;font-size:.96rem;}
+
+  /* contact block */
+  .contact{
+    border-top:1px solid var(--rule);background:var(--sand-soft);color:var(--ink);
+    background-image:radial-gradient(circle at 96% 100%, rgba(181,118,58,.18), transparent 52%);
+  }
+  .contact h2{color:var(--primary);}
+  .contact-lede{
+    font-family:"Archivo",sans-serif;font-weight:800;letter-spacing:-0.035em;
+    font-size:clamp(1.9rem,4.6vw,3.1rem);line-height:1.1;max-width:18ch;margin:0 0 26px;
+  }
+  .contact p{color:var(--ink-2);margin-bottom:32px;}
+  .links{display:flex;flex-wrap:wrap;gap:14px;}
+  .links a{
+    font-family:"Archivo",sans-serif;font-size:.95rem;font-weight:600;text-decoration:none;
+    padding:12px 22px;border-radius:4px;border:2px solid rgba(47,39,27,.28);
+    transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .links a:hover{background:var(--coral);color:#fff;border-color:var(--coral);}
+
+  footer{background:var(--sand-soft);color:var(--ink-3);padding:0 0 34px;
+    font-family:"Archivo",sans-serif;font-size:.8rem;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="topbar">
+    <div class="wrap">
+      <div class="mark">Melody Yang</div>
+      <nav class="topnav" aria-label="Sections">
+        <a href="#about">About</a>
+        <a href="#work">Work</a>
+        <a href="#systems">Systems</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="wrap">
+      <div>
+        <h1>I build the systems behind how work gets requested, routed, and reported.</h1>
+        <p class="hero-sub">Nine years designing intake, workflow, and reporting systems inside FDA-regulated medical device operations — across US, Singapore, and Costa Rica sites.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#work">See how I work</a>
+          <a class="btn btn-quiet" href="#contact">Get in touch</a>
+        </div>
+      </div>
+
+      <div class="record">
+        <div class="record-head"><span>Current status</span><span>Irvine, CA</span></div>
+        <dl>
+          <dt>Availability</dt>
+          <dd><span class="status"><span class="dot"></span>Open to full-time roles</span></dd>
+          <dt>Focus</dt>
+          <dd>Business systems analysis, workflow design, business applications</dd>
+          <dt>Working in</dt>
+          <dd>Smartsheet · Power BI · Maximo · Microsoft 365 · Python</dd>
+          <dt>Studying</dt>
+          <dd>Master of Science, Data Analytics Engineering — Northeastern University</dd>
+        </dl>
+      </div>
+    </div>
+  </header>
+</div>
+
+<section id="about">
+  <div class="wrap sec-inner prose">
+    <h2>About</h2>
+    <p class="lede">Most of my work starts the same way: a team has a process that runs on email, spreadsheets, and memory.</p>
+    <p>Requests get lost. Approvals happen in someone's inbox. Nobody can answer the question "how much work do we actually have right now?" — at least not without three days of digging.</p>
+    <p>What I do is sit with the people doing the work, map what actually happens rather than what the procedure says it does, and rebuild it as a real system. Structured intake. Routing and approval that's visible. Clean data underneath. A dashboard that answers the recurring question before anyone has to ask it.</p>
+    <p>I did that for nine years at Edwards Lifesciences in Class III medical device operations, where a workflow also has to hold up to an ISO 13485 audit — which changes how you design it. The trail has to be a by-product of the process, not something you assemble afterward.</p>
+    <p>I'm completing a Master of Science in Data Analytics Engineering at Northeastern University. My undergraduate degree is a Bachelor of Science in Statistics from the University of California, Davis, and I hold a Lean Six Sigma Green Belt.</p>
+  </div>
+</section>
+
+<section id="capabilities">
+  <div class="wrap sec-inner">
+    <h2>What I do</h2>
+    <div class="caps">
+      <div class="cap"><h3>Requirements and process discovery</h3><p>Interviewing process owners, mapping current state, and turning "we just kind of know" into something you can build against.</p></div>
+      <div class="cap"><h3>Intake and workflow design</h3><p>Structured forms, conditional logic, routing rules, approval paths, and the notifications that keep people out of each other's inboxes.</p></div>
+      <div class="cap"><h3>Reporting and KPI development</h3><p>Power BI dashboards, DAX measures, Power Query transformations, and refresh pipelines that don't need a human to run them.</p></div>
+      <div class="cap"><h3>Data governance and reconciliation</h3><p>Tracing discrepancies across systems back to source records, and correcting ownership and master data before it becomes an audit finding.</p></div>
+      <div class="cap"><h3>Workflow automation</h3><p>Python, Smartsheet API, Power Automate, Microsoft Graph, and PowerShell — applied to the tasks that shouldn't be done by hand twice.</p></div>
+      <div class="cap"><h3>Rollout and adoption</h3><p>Training design, documentation, and the follow-through that decides whether a new system gets used or quietly abandoned.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap sec-inner">
+    <h2>Selected work</h2>
+
+    <!-- 1 -->
+    <article class="entry">
+      <div class="entry-head">
+        <h3>Controlled-access program, rebuilt across three countries</h3>
+        <div class="outcome">~50% faster turnaround</div>
+      </div>
+      <p class="hook">An access request process that ran on email across US, Singapore, and Costa Rica — redesigned as a governed workflow that produces its own audit evidence.</p>
+
+      <figure class="figure">
+        <svg viewBox="0 0 680 236" role="img" aria-label="Diagram: a request passes an eligibility check, routes to one of three site approval lanes, then is approved and logged.">
+          <defs><marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--c)"/></marker></defs>
+          <rect x="6" y="92" width="122" height="52" rx="6" fill="var(--c)"/>
+          <text class="svg-white" x="67" y="114" text-anchor="middle">Request</text>
+          <text class="svg-white" x="67" y="130" text-anchor="middle" opacity=".8">submitted</text>
+          <line x1="132" y1="118" x2="164" y2="118" stroke="var(--c)" stroke-width="2" marker-end="url(#a1)"/>
+          <rect x="172" y="88" width="138" height="60" rx="6" fill="#fff" stroke="var(--c)" stroke-width="2"/>
+          <text class="svg-label" x="241" y="112" text-anchor="middle">Eligibility check</text>
+          <text class="svg-small" x="241" y="128" text-anchor="middle">caught at intake</text>
+          <line x1="314" y1="118" x2="344" y2="62" stroke="var(--c)" stroke-width="2" marker-end="url(#a1)"/>
+          <line x1="314" y1="118" x2="344" y2="118" stroke="var(--c)" stroke-width="2" marker-end="url(#a1)"/>
+          <line x1="314" y1="118" x2="344" y2="174" stroke="var(--c)" stroke-width="2" marker-end="url(#a1)"/>
+          <rect x="352" y="34" width="132" height="44" rx="6" fill="#fff" stroke="var(--rule)" stroke-width="2"/>
+          <text class="svg-label" x="418" y="61" text-anchor="middle">US approvers</text>
+          <rect x="352" y="96" width="132" height="44" rx="6" fill="#fff" stroke="var(--rule)" stroke-width="2"/>
+          <text class="svg-label" x="418" y="123" text-anchor="middle">Singapore</text>
+          <rect x="352" y="158" width="132" height="44" rx="6" fill="#fff" stroke="var(--rule)" stroke-width="2"/>
+          <text class="svg-label" x="418" y="185" text-anchor="middle">Costa Rica</text>
+          <line x1="488" y1="56" x2="518" y2="112" stroke="var(--c)" stroke-width="2" marker-end="url(#a1)"/>
+          <line x1="488" y1="118" x2="518" y2="118" stroke="var(--c)" stroke-width="2" marker-end="url(#a1)"/>
+          <line x1="488" y1="180" x2="518" y2="124" stroke="var(--c)" stroke-width="2" marker-end="url(#a1)"/>
+          <rect x="526" y="88" width="148" height="60" rx="6" fill="var(--ink)"/>
+          <text class="svg-white" x="600" y="112" text-anchor="middle">Approved</text>
+          <text class="svg-white" x="600" y="129" text-anchor="middle" opacity=".72">and logged to record</text>
+        </svg>
+        <figcaption>Schematic — request routing and approval path</figcaption>
+      </figure>
+
+      <dl class="rows">
+        <dt>Problem</dt>
+        <dd>Requests for a restricted program moved by email across three sites. There was no standard intake, no visible approval status, and when the audit came, no clean record of who approved what or why.</dd>
+        <dt>Approach</dt>
+        <dd>I sat with the approvers at each site and mapped what actually happened — each site had a different unwritten path and none of it was documented. Then I redesigned the intake with eligibility questions up front, built routing by site and project type, wrote the process map and training, and rolled it out across all three regions.</dd>
+        <dt>Outcome</dt>
+        <dd>Turnaround dropped roughly 50%. The bigger change was that access reviews became a report I could run instead of a two-week reconstruction project.</dd>
+      </dl>
+      <div class="tags"><span class="tag">Access governance</span><span class="tag">Approval routing</span><span class="tag">Multi-site rollout</span><span class="tag">Audit readiness</span></div>
+    </article>
+
+    <!-- 2 -->
+    <article class="entry c-plum">
+      <div class="entry-head">
+        <h3>Digital intake replacing paper and email requests</h3>
+        <div class="outcome">Four functions, one system</div>
+      </div>
+      <p class="hook">High-volume operational requests arrived by paper work order and email. Requirements got missed, and nobody could report on demand.</p>
+
+      <figure class="figure">
+        <svg viewBox="0 0 680 244" role="img" aria-label="Diagram: a structured intake form feeds a live status list with tracked request states.">
+          <defs><marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--c)"/></marker></defs>
+          <rect x="6" y="14" width="256" height="216" rx="8" fill="#fff" stroke="var(--rule)" stroke-width="2"/>
+          <text class="svg-label" x="26" y="44">Structured intake form</text>
+          <rect x="26" y="60" width="216" height="26" rx="4" fill="var(--tint)"/>
+          <text class="svg-small" x="38" y="77">Request type</text>
+          <rect x="26" y="94" width="216" height="26" rx="4" fill="var(--tint)"/>
+          <text class="svg-small" x="38" y="111">Quantity and specification</text>
+          <rect x="26" y="128" width="216" height="26" rx="4" fill="var(--tint)"/>
+          <text class="svg-small" x="38" y="145">Needed by</text>
+          <rect x="26" y="162" width="216" height="26" rx="4" fill="var(--tint)"/>
+          <text class="svg-small" x="38" y="179">Project and cost centre</text>
+          <rect x="26" y="196" width="86" height="24" rx="4" fill="var(--c)"/>
+          <text class="svg-white" x="69" y="212" text-anchor="middle">Submit</text>
+
+          <line x1="272" y1="122" x2="316" y2="122" stroke="var(--c)" stroke-width="2" marker-end="url(#a2)"/>
+          <text class="svg-small" x="294" y="112" text-anchor="middle">auto</text>
+
+          <rect x="326" y="14" width="348" height="216" rx="8" fill="#fff" stroke="var(--rule)" stroke-width="2"/>
+          <text class="svg-label" x="346" y="44">Live request tracker</text>
+          <line x1="346" y1="56" x2="654" y2="56" stroke="var(--rule)" stroke-width="1.5"/>
+          <text class="svg-small" x="346" y="80">RQ-1042</text><text class="svg-small" x="426" y="80">Tissue processing</text>
+          <rect x="576" y="66" width="78" height="20" rx="10" fill="var(--teal)"/><text class="svg-white" x="615" y="80" text-anchor="middle" font-size="10">Complete</text>
+          <text class="svg-small" x="346" y="112">RQ-1043</text><text class="svg-small" x="426" y="112">Mechanical testing</text>
+          <rect x="576" y="98" width="78" height="20" rx="10" fill="var(--amber)"/><text class="svg-white" x="615" y="112" text-anchor="middle" font-size="10">In progress</text>
+          <text class="svg-small" x="346" y="144">RQ-1044</text><text class="svg-small" x="426" y="144">Histology</text>
+          <rect x="576" y="130" width="78" height="20" rx="10" fill="var(--amber)"/><text class="svg-white" x="615" y="144" text-anchor="middle" font-size="10">In progress</text>
+          <text class="svg-small" x="346" y="176">RQ-1045</text><text class="svg-small" x="426" y="176">Lab testing</text>
+          <rect x="576" y="162" width="78" height="20" rx="10" fill="var(--c)"/><text class="svg-white" x="615" y="176" text-anchor="middle" font-size="10">Queued</text>
+          <text class="svg-small" x="346" y="208">RQ-1046</text><text class="svg-small" x="426" y="208">Tissue processing</text>
+          <rect x="576" y="194" width="78" height="20" rx="10" fill="var(--c)"/><text class="svg-white" x="615" y="208" text-anchor="middle" font-size="10">Queued</text>
+        </svg>
+        <figcaption>Schematic — structured intake feeding a live status view</figcaption>
+      </figure>
+
+      <dl class="rows">
+        <dt>Problem</dt>
+        <dd>Intake was unstructured, so requests routinely arrived incomplete. Status was invisible to the requester, which meant a steady stream of "where is my order?" interruptions — and there was no usable data to report workload from.</dd>
+        <dt>Approach</dt>
+        <dd>I built Smartsheet intake forms that captured every requirement at submission, set up automated confirmations and team notifications, added barcode and QR scanning to cut manual entry error, and built the dashboards and monthly management reporting on top of the same data.</dd>
+        <dt>Outcome</dt>
+        <dd>400+ requests and 22K+ samples a year in tissue processing alone. The same intake pattern was then extended to lab testing, mechanical testing, and histology — four functions, each run by a different team, working from one system and one set of definitions. Status chasing largely stopped.</dd>
+      </dl>
+      <div class="tags"><span class="tag">Smartsheet</span><span class="tag">Form design</span><span class="tag">Automated notifications</span><span class="tag">Multi-team adoption</span><span class="tag">Dashboards</span></div>
+    </article>
+
+    <!-- 3 -->
+    <article class="entry c-teal">
+      <div class="entry-head">
+        <h3>API automation that ended the weekly export-and-paste cycle</h3>
+        <div class="outcome">Up to 20 hrs/week saved at peak</div>
+      </div>
+      <p class="hook">The same export, clean, and re-upload routine every week — until it read and wrote directly through the API instead.</p>
+
+      <figure class="figure">
+        <svg viewBox="0 0 680 200" role="img" aria-label="Diagram comparing a five-step manual export process with a single direct API connection including validation.">
+          <defs><marker id="a3" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--c)"/></marker>
+                 <marker id="a3g" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#BBAF98"/></marker></defs>
+          <text class="svg-small" x="6" y="20">Before — manual, every week</text>
+          <g opacity=".62">
+            <rect x="6" y="32" width="112" height="40" rx="5" fill="#fff" stroke="#DBD0BC" stroke-width="1.5"/>
+            <text class="svg-small" x="62" y="56" text-anchor="middle">Export</text>
+            <line x1="122" y1="52" x2="140" y2="52" stroke="#BBAF98" stroke-width="2" marker-end="url(#a3g)"/>
+            <rect x="146" y="32" width="112" height="40" rx="5" fill="#fff" stroke="#DBD0BC" stroke-width="1.5"/>
+            <text class="svg-small" x="202" y="56" text-anchor="middle">Open in Excel</text>
+            <line x1="262" y1="52" x2="280" y2="52" stroke="#BBAF98" stroke-width="2" marker-end="url(#a3g)"/>
+            <rect x="286" y="32" width="112" height="40" rx="5" fill="#fff" stroke="#DBD0BC" stroke-width="1.5"/>
+            <text class="svg-small" x="342" y="56" text-anchor="middle">Clean by hand</text>
+            <line x1="402" y1="52" x2="420" y2="52" stroke="#BBAF98" stroke-width="2" marker-end="url(#a3g)"/>
+            <rect x="426" y="32" width="112" height="40" rx="5" fill="#fff" stroke="#DBD0BC" stroke-width="1.5"/>
+            <text class="svg-small" x="482" y="56" text-anchor="middle">Re-upload</text>
+            <line x1="542" y1="52" x2="560" y2="52" stroke="#BBAF98" stroke-width="2" marker-end="url(#a3g)"/>
+            <rect x="566" y="32" width="108" height="40" rx="5" fill="#fff" stroke="#DBD0BC" stroke-width="1.5"/>
+            <text class="svg-small" x="620" y="56" text-anchor="middle">Report</text>
+          </g>
+
+          <text class="svg-small" x="6" y="120">After — direct connection</text>
+          <rect x="6" y="132" width="150" height="52" rx="6" fill="var(--c)"/>
+          <text class="svg-white" x="81" y="163" text-anchor="middle">Source system</text>
+          <line x1="160" y1="158" x2="252" y2="158" stroke="var(--c)" stroke-width="2.5" marker-end="url(#a3)"/>
+          <text class="svg-small" x="206" y="150" text-anchor="middle">API read / write</text>
+          <rect x="260" y="132" width="176" height="52" rx="6" fill="#fff" stroke="var(--c)" stroke-width="2.5"/>
+          <text class="svg-label" x="348" y="155" text-anchor="middle">Validation rules</text>
+          <text class="svg-small" x="348" y="171" text-anchor="middle">bad entries flagged, not passed</text>
+          <line x1="440" y1="158" x2="518" y2="158" stroke="var(--c)" stroke-width="2.5" marker-end="url(#a3)"/>
+          <rect x="526" y="132" width="148" height="52" rx="6" fill="var(--ink)"/>
+          <text class="svg-white" x="600" y="163" text-anchor="middle">Report</text>
+        </svg>
+        <figcaption>Schematic — before and after the automation</figcaption>
+      </figure>
+
+      <dl class="rows">
+        <dt>Problem</dt>
+        <dd>Reporting depended on manually exporting operational data, cleaning it in Excel, and re-uploading it. During peak demand that consumed most of a workday, every week.</dd>
+        <dt>Approach</dt>
+        <dd>I wrote Python automation that read and updated the data directly through the Smartsheet API, removing the export step entirely. The part that made it stick was the validation layer — rules that flag inconsistent entries rather than passing them through silently, which is what got people to stop double-checking by hand.</dd>
+        <dt>Outcome</dt>
+        <dd>Saved up to 20 hours per week during peak demand periods, and the built-in checks caught data errors that used to surface downstream.</dd>
+      </dl>
+      <div class="tags"><span class="tag">Python</span><span class="tag">REST API</span><span class="tag">Data quality checks</span><span class="tag">Process automation</span></div>
+    </article>
+
+    <!-- 4 -->
+    <article class="entry">
+      <div class="entry-head">
+        <h3>Reporting rebuild: from a five-day wait to same day</h3>
+        <div class="outcome">~40% fewer ad hoc requests</div>
+      </div>
+      <p class="hook">Every metrics question turned into a manual pull, and the numbers didn't always agree with each other.</p>
+
+      <figure class="figure">
+        <svg viewBox="0 0 680 240" role="img" aria-label="Illustrative dashboard layout with three KPI tiles, a bar chart of monthly demand, and a turnaround trend line.">
+          <rect x="6" y="10" width="214" height="62" rx="6" fill="#fff" stroke="var(--rule)" stroke-width="2"/>
+          <text class="svg-small" x="24" y="34">Open requests</text>
+          <text x="24" y="60" font-family="Archivo,sans-serif" font-size="22" font-weight="800" fill="var(--c)">38</text>
+          <rect x="233" y="10" width="214" height="62" rx="6" fill="#fff" stroke="var(--rule)" stroke-width="2"/>
+          <text class="svg-small" x="251" y="34">Median turnaround</text>
+          <text x="251" y="60" font-family="Archivo,sans-serif" font-size="22" font-weight="800" fill="var(--teal)">0.8 d</text>
+          <rect x="460" y="10" width="214" height="62" rx="6" fill="#fff" stroke="var(--rule)" stroke-width="2"/>
+          <text class="svg-small" x="478" y="34">On-time delivery</text>
+          <text x="478" y="60" font-family="Archivo,sans-serif" font-size="22" font-weight="800" fill="var(--amber)">96%</text>
+
+          <rect x="6" y="86" width="330" height="146" rx="6" fill="#fff" stroke="var(--rule)" stroke-width="2"/>
+          <text class="svg-small" x="24" y="110">Demand by month</text>
+          <g fill="var(--c)">
+            <rect x="26" y="176" width="26" height="38" rx="2"/><rect x="66" y="160" width="26" height="54" rx="2"/>
+            <rect x="106" y="146" width="26" height="68" rx="2"/><rect x="146" y="164" width="26" height="50" rx="2"/>
+            <rect x="186" y="132" width="26" height="82" rx="2"/><rect x="226" y="122" width="26" height="92" rx="2"/>
+            <rect x="266" y="140" width="26" height="74" rx="2"/>
+          </g>
+          <line x1="20" y1="214" x2="320" y2="214" stroke="var(--rule)" stroke-width="1.5"/>
+
+          <rect x="348" y="86" width="326" height="146" rx="6" fill="#fff" stroke="var(--rule)" stroke-width="2"/>
+          <text class="svg-small" x="366" y="110">Turnaround trend</text>
+          <line x1="366" y1="214" x2="656" y2="214" stroke="var(--rule)" stroke-width="1.5"/>
+          <polyline points="374,130 420,138 466,152 512,178 558,196 604,204 648,206" fill="none" stroke="var(--teal)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <g fill="var(--teal)">
+            <circle cx="374" cy="130" r="4"/><circle cx="466" cy="152" r="4"/><circle cx="558" cy="196" r="4"/><circle cx="648" cy="206" r="4"/>
+          </g>
+        </svg>
+        <figcaption>Illustrative dashboard layout — sample figures, not client data</figcaption>
+      </figure>
+
+      <dl class="rows">
+        <dt>Problem</dt>
+        <dd>There was no maintainable reporting layer. Answering a leadership question took 2–5 business days of manual work, and different people pulling the same metric could arrive at different figures.</dd>
+        <dt>Approach</dt>
+        <dd>I designed an ETL and auto-refresh process over 6K+ historical records, standardized the current-year data model so definitions were fixed in one place, and built Power BI dashboards around the KPIs people were actually asking about.</dd>
+        <dt>Outcome</dt>
+        <dd>Reporting turnaround went from 2–5 days to under one day, and recurring ad hoc requests fell roughly 40% because the answers were already on screen.</dd>
+      </dl>
+      <div class="tags"><span class="tag">Power BI</span><span class="tag">DAX</span><span class="tag">Power Query</span><span class="tag">KPI definition</span></div>
+    </article>
+
+    <!-- 5 -->
+    <article class="entry c-plum">
+      <div class="entry-head">
+        <h3>Asset data governance during an organizational transition</h3>
+        <div class="outcome">~400 records corrected before audit</div>
+      </div>
+      <p class="hook">Roughly 400 equipment records carrying the wrong owner, with a compliance clock running.</p>
+
+      <figure class="figure">
+        <svg viewBox="0 0 680 210" role="img" aria-label="Diagram: asset records with missing or incorrect owner and organisation values putting maintenance at risk, reconciled to correct ownership and schedule.">
+          <defs><marker id="a5" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--c)"/></marker></defs>
+
+          <text class="svg-small" x="6" y="18">After reorganisation</text>
+          <rect x="6" y="26" width="302" height="166" rx="6" fill="#fff" stroke="var(--rule)" stroke-width="2"/>
+          <text class="svg-small" x="22" y="48">Asset</text>
+          <text class="svg-small" x="104" y="48">Owner</text>
+          <text class="svg-small" x="216" y="48">PM</text>
+          <line x1="22" y1="56" x2="292" y2="56" stroke="var(--rule)" stroke-width="1.5"/>
+
+          <text class="svg-small" x="22" y="79" fill="var(--ink)">EQ-1042</text>
+          <text class="svg-small" x="104" y="79" fill="var(--ink)">Operations</text>
+          <text class="svg-small" x="216" y="79" fill="var(--teal)">On schedule</text>
+
+          <rect x="98" y="88" width="104" height="22" rx="3" fill="var(--c)" opacity=".16"/>
+          <text class="svg-small" x="22" y="103" fill="var(--ink)">EQ-1088</text>
+          <text class="svg-small" x="104" y="103" fill="var(--c)" font-weight="700">Unassigned</text>
+          <text class="svg-small" x="216" y="103" fill="var(--c)" font-weight="700">At risk</text>
+
+          <rect x="98" y="116" width="104" height="22" rx="3" fill="var(--c)" opacity=".16"/>
+          <text class="svg-small" x="22" y="131" fill="var(--ink)">EQ-1130</text>
+          <text class="svg-small" x="104" y="131" fill="var(--c)" font-weight="700">Wrong org</text>
+          <text class="svg-small" x="216" y="131" fill="var(--c)" font-weight="700">At risk</text>
+
+          <text class="svg-small" x="22" y="159" fill="var(--ink)">EQ-1174</text>
+          <text class="svg-small" x="104" y="159" fill="var(--ink)">Operations</text>
+          <text class="svg-small" x="216" y="159" fill="var(--teal)">On schedule</text>
+
+          <text class="svg-small" x="22" y="182" fill="var(--ink-3)">…approximately 400 records</text>
+
+          <line x1="316" y1="108" x2="360" y2="108" stroke="var(--c)" stroke-width="2.5" marker-end="url(#a5)"/>
+          <text class="svg-small" x="338" y="98" text-anchor="middle">trace to</text>
+          <text class="svg-small" x="338" y="128" text-anchor="middle">source</text>
+
+          <text class="svg-small" x="368" y="18">Reconciled before audit</text>
+          <rect x="368" y="26" width="306" height="166" rx="6" fill="#fff" stroke="var(--rule)" stroke-width="2"/>
+          <text class="svg-small" x="384" y="48">Asset</text>
+          <text class="svg-small" x="466" y="48">Owner</text>
+          <text class="svg-small" x="578" y="48">PM</text>
+          <line x1="384" y1="56" x2="658" y2="56" stroke="var(--rule)" stroke-width="1.5"/>
+
+          <text class="svg-small" x="384" y="79" fill="var(--ink)">EQ-1042</text>
+          <text class="svg-small" x="466" y="79" fill="var(--ink)">Operations</text>
+          <text class="svg-small" x="578" y="79" fill="var(--teal)">On schedule</text>
+
+          <rect x="460" y="88" width="104" height="22" rx="3" fill="var(--teal)" opacity=".14"/>
+          <text class="svg-small" x="384" y="103" fill="var(--ink)">EQ-1088</text>
+          <text class="svg-small" x="466" y="103" fill="var(--ink)">Operations</text>
+          <text class="svg-small" x="578" y="103" fill="var(--teal)">On schedule</text>
+
+          <rect x="460" y="116" width="104" height="22" rx="3" fill="var(--teal)" opacity=".14"/>
+          <text class="svg-small" x="384" y="131" fill="var(--ink)">EQ-1130</text>
+          <text class="svg-small" x="466" y="131" fill="var(--ink)">Operations</text>
+          <text class="svg-small" x="578" y="131" fill="var(--teal)">On schedule</text>
+
+          <text class="svg-small" x="384" y="159" fill="var(--ink)">EQ-1174</text>
+          <text class="svg-small" x="466" y="159" fill="var(--ink)">Operations</text>
+          <text class="svg-small" x="578" y="159" fill="var(--teal)">On schedule</text>
+
+          <text class="svg-small" x="384" y="182" fill="var(--ink-3)">ownership and schedule restored</text>
+        </svg>
+        <figcaption>Schematic — asset records with illustrative identifiers, not client data</figcaption>
+      </figure>
+
+      <dl class="rows">
+        <dt>Problem</dt>
+        <dd>Organizational changes left a large set of asset records in Maximo with incorrect ownership and org assignments. Left alone, that becomes missed preventive maintenance and calibration — which becomes an audit finding.</dd>
+        <dt>Approach</dt>
+        <dd>I reconciled the records against source data, coordinated the corrections with the site administrator, and traced discrepancies across Maximo, MES, and JDE back to where they originated rather than patching the symptom.</dd>
+        <dt>Outcome</dt>
+        <dd>Ownership and accountability were restored ahead of the audit, and the compliance exposure was closed out.</dd>
+      </dl>
+      <div class="tags"><span class="tag">Maximo</span><span class="tag">Master data</span><span class="tag">Cross-system reconciliation</span><span class="tag">Compliance</span></div>
+    </article>
+
+    <!-- 6 -->
+    <article class="entry c-teal">
+      <div class="entry-head">
+        <h3>Finding where the rework was actually coming from</h3>
+        <div class="outcome">~$90K annual savings</div>
+      </div>
+      <p class="hook">Everyone had a theory about the source of rework. A full DMAIC project measured it instead.</p>
+
+      <figure class="figure">
+        <svg viewBox="0 0 680 224" role="img" aria-label="Pareto chart showing descending cause bars with a cumulative percentage line crossing eighty percent after the first two causes.">
+          <line x1="46" y1="182" x2="600" y2="182" stroke="var(--rule)" stroke-width="1.5"/>
+          <line x1="46" y1="26" x2="46" y2="182" stroke="var(--rule)" stroke-width="1.5"/>
+          <line x1="46" y1="64" x2="600" y2="64" stroke="var(--amber)" stroke-width="1.5" stroke-dasharray="5 5"/>
+          <text class="svg-small" x="606" y="68" fill="var(--amber)">80%</text>
+          <g fill="var(--c)">
+            <rect x="66" y="52" width="62" height="130" rx="3"/>
+            <rect x="156" y="96" width="62" height="86" rx="3"/>
+            <rect x="246" y="130" width="62" height="52" rx="3"/>
+            <rect x="336" y="148" width="62" height="34" rx="3"/>
+            <rect x="426" y="160" width="62" height="22" rx="3"/>
+            <rect x="516" y="170" width="62" height="12" rx="3"/>
+          </g>
+          <polyline points="97,88 187,62 277,48 367,38 457,32 547,28" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <g fill="var(--ink)">
+            <circle cx="97" cy="88" r="4"/><circle cx="187" cy="62" r="4"/><circle cx="277" cy="48" r="4"/><circle cx="367" cy="38" r="4"/><circle cx="457" cy="32" r="4"/><circle cx="547" cy="28" r="4"/>
+          </g>
+          <text class="svg-small" x="97" y="200" text-anchor="middle">Cause A</text>
+          <text class="svg-small" x="187" y="200" text-anchor="middle">Cause B</text>
+          <text class="svg-small" x="277" y="200" text-anchor="middle">Cause C</text>
+          <text class="svg-small" x="367" y="200" text-anchor="middle">Cause D</text>
+          <text class="svg-small" x="457" y="200" text-anchor="middle">Cause E</text>
+          <text class="svg-small" x="547" y="200" text-anchor="middle">Cause F</text>
+          <text class="svg-small" x="6" y="30">Share of rework</text>
+        </svg>
+        <figcaption>Illustrative Pareto analysis — sample figures, not client data</figcaption>
+      </figure>
+
+      <dl class="rows">
+        <dt>Problem</dt>
+        <dd>Rework was consuming a meaningful share of team capacity, but the cause was assumed rather than measured — so previous fixes had targeted the wrong step.</dd>
+        <dt>Approach</dt>
+        <dd>I ran a Lean Six Sigma Green Belt project end to end: stakeholder analysis, voice of the customer, process mapping, Pareto analysis, Gemba walk, fishbone and cause-and-effect matrix, FMEA, and control charts to establish what was actually driving the variation.</dd>
+        <dt>Outcome</dt>
+        <dd>Identified the real drivers, quantified the improvement, and delivered approximately $90K in annual savings.</dd>
+      </dl>
+      <div class="tags"><span class="tag">DMAIC</span><span class="tag">Root cause analysis</span><span class="tag">FMEA</span><span class="tag">Statistical process control</span></div>
+    </article>
+
+  </div>
+</section>
+
+<section id="systems">
+  <div class="wrap sec-inner">
+    <h2>Systems and tools</h2>
+    <dl class="sys">
+      <dt>Business applications</dt>
+      <dd>Smartsheet (including API), Maximo, MES, JDE, SharePoint and Microsoft 365, Coupa</dd>
+      <dt>Reporting</dt>
+      <dd>Power BI, DAX, Power Query, advanced Excel, Tableau</dd>
+      <dt>Automation</dt>
+      <dd>Python, Pandas, Power Automate, Microsoft Graph, REST APIs, PowerShell</dd>
+      <dt>Method</dt>
+      <dd>Lean Six Sigma Green Belt, DMAIC, process mapping, FMEA, statistical process control</dd>
+      <dt>Currently learning</dt>
+      <dd>dbt, Snowflake</dd>
+    </dl>
+  </div>
+</section>
+
+<section id="education">
+  <div class="wrap sec-inner">
+    <h2>Education and credentials</h2>
+    <ul class="creds">
+      <li><strong>Master of Science, Data Analytics Engineering</strong><span>Northeastern University — in progress</span></li>
+      <li><strong>Bachelor of Science, Statistics</strong><span>University of California, Davis</span></li>
+      <li><strong>Lean Six Sigma Green Belt</strong><span>DMAIC project delivering approximately $90K in annual savings</span></li>
+      <li><strong>AI in Healthcare</strong><span>MIT xPRO</span></li>
+      <li><strong>Data Science Career Track</strong><span>Springboard — 550+ hours in Python, statistics, and machine learning fundamentals</span></li>
+      <li><strong>Co-inventor on two US patents</strong><span>Medical device research and development</span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="contact" class="contact">
+  <div class="wrap sec-inner">
+    <h2>Contact</h2>
+    <p class="contact-lede">If you're solving something like this, I'd like to hear about it.</p>
+    <p>Looking for a full-time role in business systems analysis, workflow design, or business applications. Based in Irvine, California; open to remote and hybrid.</p>
+    <div class="links">
+      <a href="mailto:melody.yang715@gmail.com">melody.yang715@gmail.com</a>
+      <a href="https://www.linkedin.com/in/melodyhyang/">LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<footer><div class="wrap">Melody Yang — Irvine, California</div></footer>
+
+</body>
+</html>
