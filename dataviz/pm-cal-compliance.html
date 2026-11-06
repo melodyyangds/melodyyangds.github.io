@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PM and Calibration Compliance | Melody Yang</title>
+<meta name="description" content="Concept dashboard for preventive maintenance and calibration compliance, built with synthetic data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="viz.css">
+<style>
+  .years{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;}
+  @media (max-width:640px){.years{grid-template-columns:repeat(4,minmax(0,1fr));}}
+  .yr{border:1px solid var(--rule);border-radius:8px;padding:10px 10px 9px;font-family:"Archivo",sans-serif;cursor:pointer;background:#fff;text-align:left;}
+  .yr:hover{border-color:var(--primary);}
+  .yr[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);}
+  .yr .y{font-size:.76rem;color:var(--ink-3);font-weight:600;}
+  .yr .n{font-size:1.35rem;font-weight:800;margin:2px 0;}
+  .scale{display:flex;align-items:center;gap:6px;font-family:"Archivo",sans-serif;font-size:.74rem;color:var(--ink-2);flex-wrap:wrap;margin-bottom:8px;}
+  .scale i{display:inline-block;width:18px;height:12px;border-radius:2px;}
+  .scale .late{display:inline-flex;align-items:center;justify-content:center;width:18px;height:12px;border:2px solid var(--critical);border-radius:3px;color:var(--critical);font-weight:800;font-size:9px;margin-left:12px;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="topbar"><div class="wrap">
+    <a class="mark" href="../index.html">Melody Yang</a>
+    <nav class="topnav" aria-label="Site">
+      <a href="../index.html#work">Work</a>
+      <a href="../index.html#dataviz">Data viz</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </div></div>
+  <header class="page-head"><div class="wrap">
+    <p class="crumb"><a href="../index.html#dataviz">Data visualization</a> · Compliance tracking</p>
+    <h1>Keeping maintenance and calibration on time</h1>
+    <p class="lede">When preventive maintenance or calibration goes late in a regulated company, the equipment can't be used and it can turn into an audit finding. I owned this for my team, and we had zero late work orders in 6 of 7 years.</p>
+    <dl class="meta">
+      <div><dt>System of record</dt><dd>Maximo (custodian, then approver)</dd></div>
+      <div><dt>This page</dt><dd>Concept dashboard built for this portfolio</dd></div>
+      <div><dt>Grain</dt><dd>1 row per work order</dd></div>
+    </dl>
+    <p class="notice"><b>Synthetic data.</b> Asset IDs and counts are made up. The late counts by year match my real record.</p>
+  </div></header>
+</div>
+
+<section><div class="wrap sec">
+  <h2>The story</h2>
+  <dl class="rows">
+    <dt>Problem</dt>
+    <dd>100+ pieces of equipment, all on different schedules. Someone has to know what's due, which months get busy, and what's about to slip.</dd>
+    <dt>What I did</dt>
+    <dd>I managed PM and calibration in Maximo, first as custodian and then as approver. I tracked due dates, sent reminders early, booked vendors, and found backup approvers when needed. After a reorg, I also led moving about 400 equipment records to the right owners.</dd>
+    <dt>What changed</dt>
+    <dd>Zero late PM or calibration in 6 of 7 years, and the other year had just one. This page is my take on how that tracking looks as a dashboard.</dd>
+  </dl>
+</div></section>
+
+<section><div class="wrap sec">
+  <h2>Dashboard</h2>
+  <div class="dash">
+    <div class="dash-title"><h3>PM and calibration · equipment</h3><span>Pick a year below; every chart follows it</span></div>
+    <div class="filters">
+      <div class="filter"><span class="flabel" id="ft">Work type</span><div class="seg" id="f-type" role="group" aria-labelledby="ft"></div></div>
+    </div>
+    <div class="card">
+      <h4>Late work orders by year</h4>
+      <p class="sub">Target: 10 or fewer late per year. Click a year to load it below.</p>
+      <div class="years" id="years" role="group" aria-label="Select year"></div>
+    </div>
+    <div class="tiles" id="tiles"></div>
+    <div class="card">
+      <h4 id="heat-title">Work orders due by month</h4>
+      <p class="sub">Rows are asset classes. Darker cells are heavier months.</p>
+      <div class="scale" id="scale"></div>
+      <div class="chart" id="heat" data-label="Heatmap of work orders due by asset class and month"></div>
+    </div>
+    <div id="table-tools"></div>
+  </div>
+
+  <div class="dash" style="margin-top:18px">
+    <div class="dash-title"><h3>Reorganization cleanup · ~400 records</h3><span>Separate project view, not tied to the year filter</span></div>
+    <div class="card">
+      <h4>Records reassigned to the right business unit and owner</h4>
+      <p class="sub">Weekly, from the first reconciliation pull to close-out</p>
+      <div class="legend" id="re-legend"></div>
+      <div class="chart" id="reorg" data-label="Line chart of asset records reassigned and still open by week"></div>
+    </div>
+  </div>
+
+  <details class="sql">
+    <summary>Queries behind this view <span>· BigQuery-style SQL</span></summary>
+<pre><code>-- Heatmap: work orders due and late, by asset class and month
+SELECT
+  a.asset_class,
+  DATE_TRUNC(w.due_date, MONTH)                                   AS due_month,
+  w.work_type,                                                    -- 'PM' or 'CAL'
+  COUNT(*)                                                        AS due,
+  COUNTIF(w.completed_date &gt; w.due_date
+          OR (w.completed_date IS NULL AND w.due_date &lt; CURRENT_DATE())) AS late
+FROM work_orders AS w
+JOIN assets      AS a USING (asset_id)
+WHERE EXTRACT(YEAR FROM w.due_date) = @year
+GROUP BY 1, 2, 3;
+
+-- Reorg cleanup: records whose owning org no longer matches the org chart
+SELECT a.asset_id, a.owner_org AS system_org, m.new_org, a.custodian_id
+FROM assets AS a
+JOIN org_mapping AS m ON a.custodian_id = m.employee_id
+WHERE a.owner_org IS DISTINCT FROM m.new_org   -- also catches blank owners
+ORDER BY m.new_org, a.asset_id;</code></pre>
+  </details>
+  <div class="chips"><span class="chip">Maximo</span><span class="chip">Preventive maintenance</span><span class="chip">Calibration</span><span class="chip">Cross-system reconciliation</span><span class="chip">Audit readiness</span><span class="chip">ISO 13485</span></div>
+</div></section>
+
+<section><div class="wrap sec">
+  <h2>Real outcome</h2>
+  <div class="outcomes">
+    <div class="oc"><b>0 late in 6 of 7 years</b><span>PM and calibration, 2019 to 2025. The one exception (2024) was a single late PM against a target of 10 or fewer.</span></div>
+    <div class="oc"><b>~400 records</b><span>Reassigned to the right business unit and owner after a reorganization.</span></div>
+    <div class="oc"><b>100+ work orders</b><span>Approved for a team relocation that moved about $300K of capital equipment.</span></div>
+  </div>
+</div></section>
+
+<section><div class="wrap sec">
+  <nav class="pager" aria-label="More dashboards">
+    <a href="inventory-adoption.html"><small>Previous dashboard</small><strong>← Inventory system adoption</strong></a>
+    <a class="next" href="../index.html#dataviz"><small>Back to</small><strong>All data visualization →</strong></a>
+  </nav>
+</div></section>
+
+<footer><div class="wrap">Melody Yang · Irvine, California · All figures on this page are synthetic unless marked as real outcome.</div></footer>
+
+<script src="viz.js"></script>
+<script>
+(function () {
+  const C = { s1: VZ.css("--s1"), s2: VZ.css("--s2"), good: VZ.css("--good"), crit: VZ.css("--critical") };
+  const RAMP = ["#D4ECE6", "#A3D5C9", "#6FBBA9", "#3B9F8A", "#0B8A76", "#06604F"];
+  const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const YEARS = [2019, 2020, 2021, 2022, 2023, 2024, 2025];
+  const CLASSES = [
+    { name: "Scales and gauges", n: 22, cal: 3 },
+    { name: "Handheld tools", n: 36, cal: 6 },
+    { name: "Environmental chambers", n: 10, pm: 6, cal: 12 },
+    { name: "Ovens and dryers", n: 14, pm: 12, cal: 12 },
+    { name: "Test fixtures", n: 9, pm: 6, cal: 12 },
+    { name: "Imaging systems", n: 11, pm: 12 },
+    { name: "Chillers and HVAC units", n: 12, pm: 6, cal: 12 },
+    { name: "Sensors and loggers", n: 18, cal: 12 }
+  ];
+  const r = VZ.rng(1305);
+  const assets = []; let id = 1000;
+  CLASSES.forEach((c, ci) => { for (let k = 0; k < c.n; k++) assets.push({ id: "EQ-" + (id += 3 + Math.floor(r() * 9)), c: ci, off: Math.floor(r() * 12) }); });
+  const wos = [];
+  YEARS.forEach(function (y) {
+    for (let m = 0; m < 12; m++) {
+      assets.forEach(function (a) {
+        const c = CLASSES[a.c], abs = (y - 2019) * 12 + m;
+        [["PM", c.pm], ["CAL", c.cal]].forEach(function (t) {
+          if (!t[1] || (abs - a.off) % t[1] !== 0 || abs < a.off) return;
+          const day = 1 + Math.floor(r() * 27);
+          wos.push({ y: y, m: m, a: a, type: t[0], due: day, early: 2 + Math.floor(r() * 18), late: 0, move: false });
+        });
+      });
+    }
+  });
+  // 2024 relocation: pre- and post-move calibration on equipment that moved
+  assets.filter((a) => [0, 2, 3, 4, 6].indexOf(a.c) >= 0 && r() < 0.62).forEach(function (a) {
+    wos.push({ y: 2024, m: 5, a: a, type: "CAL", due: 10, early: 3, late: 0, move: true });
+    wos.push({ y: 2024, m: 7, a: a, type: "CAL", due: 20, early: 1, late: 0, move: true });
+  });
+  // the one real-record exception: a single late PM in 2024
+  const lateOne = wos.find((w) => w.y === 2024 && w.type === "PM" && w.m === 9);
+  lateOne.late = 9;
+
+  const state = { year: 2025, type: "all" };
+  VZ.seg(document.getElementById("f-type"), [{ label: "All", value: "all" }, { label: "PM", value: "PM" }, { label: "Calibration", value: "CAL" }], "all", (v) => { state.type = v; render(); });
+  const sel = () => wos.filter((w) => w.y === state.year && (state.type === "all" || w.type === state.type));
+
+  function years() {
+    const el = document.getElementById("years"); el.innerHTML = "";
+    YEARS.forEach(function (y) {
+      const n = wos.filter((w) => w.y === y && w.late && (state.type === "all" || w.type === state.type)).length;
+      const b = VZ.h("button", "yr", el); b.type = "button"; b.setAttribute("aria-pressed", String(y === state.year));
+      VZ.h("div", "y", b, String(y)); VZ.h("div", "n", b, String(n));
+      const st = VZ.h("span", "st " + (n === 0 ? "good" : "crit"), b, n === 0 ? "✓ 0 late" : "! " + n + " late, on target");
+      if (n > 10) st.textContent = "! Over target";
+      b.setAttribute("aria-label", y + ": " + n + " late work orders");
+      b.addEventListener("click", () => { state.year = y; render(); });
+    });
+  }
+  function tiles(rows) {
+    const el = document.getElementById("tiles"); el.innerHTML = "";
+    const late = rows.filter((w) => w.late).length, move = rows.filter((w) => w.move).length;
+    const used = new Set(rows.map((w) => w.a.id)).size;
+    [["Assets with work due", VZ.fmt(used), "Of " + assets.length + " tracked"],
+     ["Work orders due", VZ.fmt(rows.length), move ? VZ.fmt(move) + " from the relocation" : "PM and calibration"],
+     ["Completed on time", VZ.pct(rows.length ? 1 - late / rows.length : 1, 1), "Closed on or before due date"],
+     ["Late", String(late), late ? "Closed " + lateOne.late + " days late" : "Nothing slipped"]].forEach(function (t, i) {
+      const d = VZ.h("div", "tile", el); VZ.h("div", "k", d, t[0]); const v = VZ.h("div", "v", d, t[1]); VZ.h("div", "d", d, t[2]);
+      if (i === 3) { v.style.color = late ? C.crit : C.good; v.textContent = (late ? "! " : "✓ ") + t[1]; }
+    });
+  }
+  function render() {
+    const rows = sel();
+    years(); tiles(rows);
+    document.getElementById("heat-title").textContent = "Work orders due by month · " + state.year + (state.type === "all" ? "" : state.type === "PM" ? " · PM" : " · Calibration");
+    const vals = CLASSES.map((c, ci) => MON.map((m, mi) => rows.filter((w) => w.a.c === ci && w.m === mi).length));
+    const flags = CLASSES.map((c, ci) => MON.map((m, mi) => rows.filter((w) => w.a.c === ci && w.m === mi && w.late).length));
+    const hm = VZ.heat(document.getElementById("heat"), {
+      rows: CLASSES.map((c) => c.name), cols: MON, values: vals, flags: flags, ramp: RAMP,
+      tip: function (ri, mi) {
+        const g = rows.filter((w) => w.a.c === ri && w.m === mi);
+        const out = [{ label: "Due", value: VZ.fmt(g.length), color: RAMP[4] },
+          { label: "PM", value: VZ.fmt(g.filter((w) => w.type === "PM").length) },
+          { label: "Calibration", value: VZ.fmt(g.filter((w) => w.type === "CAL").length) }];
+        const mv = g.filter((w) => w.move).length; if (mv) out.push({ label: "Relocation", value: VZ.fmt(mv) });
+        const lt = g.filter((w) => w.late);
+        out.push(lt.length ? { label: "! Late: " + lt[0].a.id, value: lt[0].late + " days", color: C.crit } : { label: "✓ Late", value: "0", color: C.good });
+        return { title: CLASSES[ri].name + " · " + MON[mi] + " " + state.year, rows: out };
+      }
+    });
+    const sc = document.getElementById("scale"); sc.innerHTML = "";
+    sc.appendChild(document.createTextNode("Fewer"));
+    RAMP.forEach((c) => { const i = VZ.h("i", null, sc); i.style.background = c; });
+    sc.appendChild(document.createTextNode("More (max " + hm.max + " in a month)"));
+    VZ.h("span", "late", sc, "!"); sc.appendChild(document.createTextNode("Late work order"));
+    // reorg project view
+    const wk = [], done = [], open = []; let d = 0;
+    const plan = [0, 38, 92, 151, 205, 262, 318, 361, 388, 400];
+    plan.forEach((v, i) => { wk.push("Week " + (i + 1)); done.push(v); open.push(400 - v); });
+    const ser = [{ name: "Reassigned and verified", color: C.s1, values: done }, { name: "Still on the wrong owner", color: C.s2, values: open }];
+    VZ.legend(document.getElementById("re-legend"), ser, "line");
+    VZ.line(document.getElementById("reorg"), { labels: wk, series: ser, height: 230, tickEvery: 1, yMax: 400 });
+    refresh();
+  }
+  const refresh = VZ.tableTools(document.getElementById("table-tools"), function () {
+    const rows = sel().slice().sort((a, b) => a.m - b.m || a.due - b.due);
+    return { cols: [{ key: "asset", label: "Asset" }, { key: "cls", label: "Class" }, { key: "type", label: "Type" },
+      { key: "due", label: "Due date" }, { key: "status", label: "Status" }, { key: "note", label: "Note" }],
+      rows: rows.map((w) => ({ asset: w.a.id, cls: CLASSES[w.a.c].name, type: w.type,
+        due: w.y + "-" + String(w.m + 1).padStart(2, "0") + "-" + String(w.due).padStart(2, "0"),
+        status: w.late ? "Late (" + w.late + " days)" : "On time (" + w.early + " days early)", note: w.move ? "Relocation" : "" })) };
+  }, "pm-cal-synthetic.csv");
+  VZ.mount(render);
+})();
+</script>
+</body>
+</html>

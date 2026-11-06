@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventory System Adoption | Melody Yang</title>
+<meta name="description" content="How a user survey, a priority matrix, and one physical fix got a team using its chemical inventory system. Synthetic data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="viz.css">
+<style>
+  .steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;counter-reset:st;}
+  @media (max-width:860px){.steps{grid-template-columns:repeat(2,minmax(0,1fr));}}
+  .step{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:12px 12px 11px;font-family:"Archivo",sans-serif;counter-increment:st;}
+  .step::before{content:counter(st);display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;font-size:.72rem;font-weight:700;margin-bottom:8px;}
+  .step b{display:block;font-size:.84rem;line-height:1.25;}
+  .step span{display:block;font-size:.74rem;color:var(--ink-2);margin-top:4px;line-height:1.35;}
+  .step.pending{border-style:solid;background:var(--sand-soft);}
+  .step.pending::before{background:var(--ink-3);}
+  details.sql pre .c{color:var(--ink-3);}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="topbar"><div class="wrap">
+    <a class="mark" href="../index.html">Melody Yang</a>
+    <nav class="topnav" aria-label="Site">
+      <a href="../index.html#work">Work</a>
+      <a href="../index.html#dataviz">Data viz</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </div></div>
+  <header class="page-head"><div class="wrap">
+    <p class="crumb"><a href="../index.html#dataviz">Data visualization</a> · Process improvement</p>
+    <h1>Getting people to actually use the system</h1>
+    <p class="lede">We had a chemical inventory system that almost nobody used. Before adding more training, I asked people what was actually getting in the way.</p>
+    <dl class="meta">
+      <div><dt>Method</dt><dd>User survey · working group · pilot fix</dd></div>
+      <div><dt>Tools</dt><dd>Survey analysis · Python + system API</dd></div>
+      <div><dt>Role</dt><dd>Led the working group</dd></div>
+    </dl>
+    <p class="notice"><b>Synthetic data.</b> Survey numbers and the usage trend are made up. The steps and the fix are real.</p>
+  </div></header>
+</div>
+
+<section><div class="wrap sec">
+  <h2>The story</h2>
+  <dl class="rows">
+    <dt>Problem</dt>
+    <dd>Chemicals weren't getting logged, labels got skipped, and things weren't where the system said. Honestly, I didn't know where everything was either when I started.</dd>
+    <dt>What I did</dt>
+    <dd>I learned the system from its owner, then surveyed everyone who used it. 2 answers kept coming up: people didn't know how to use it, and they couldn't find things. My working group fixed that first with one scanning station that has everything in one spot. Then we wrote guides, ran training, and cleaned up storage.</dd>
+    <dt>What changed</dt>
+    <dd>People were using the station before I left, and the records were audit-ready. The fix turned out to be about putting things in one place, not more training.</dd>
+  </dl>
+</div></section>
+
+<section><div class="wrap sec">
+  <h2>Dashboard</h2>
+  <div class="dash">
+    <div class="dash-title"><h3>From survey to fix</h3><span>Hover or tab through any chart for values</span></div>
+    <div class="tiles" id="tiles"></div>
+    <div class="grid2 even">
+      <div class="card">
+        <h4>What gets in the way?</h4>
+        <p class="sub">Share of survey respondents who named each issue (pick all that apply)</p>
+        <div class="chart" id="pain" data-label="Bar chart of survey pain points"></div>
+      </div>
+      <div class="card">
+        <h4>What to fix first</h4>
+        <p class="sub">Working group rating: impact on the top 2 issues vs effort</p>
+        <div class="legend"><span><i style="background:var(--s1);border-radius:50%"></i>Shipped</span><span><i style="background:#B8AD9A;border-radius:50%"></i>Not shipped</span></div>
+        <div class="chart" id="matrix" data-label="Impact versus effort matrix of possible fixes"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h4>Items logged in the system per week</h4>
+      <p class="sub">Scans at the new station plus manual entries</p>
+      <div class="chart" id="usage" data-label="Line chart of weekly items logged before and after the scanning station"></div>
+    </div>
+    <div class="card">
+      <h4>How it rolled out</h4>
+      <p class="sub">The real sequence</p>
+      <div class="steps">
+        <div class="step"><b>Learn the system</b><span>Sat down with the system owner</span></div>
+        <div class="step"><b>Survey users</b><span>Asked what gets in the way</span></div>
+        <div class="step"><b>Working group</b><span>Ranked fixes by impact and effort</span></div>
+        <div class="step"><b>Scanning station</b><span>Everything needed, in one spot</span></div>
+        <div class="step"><b>Guides, training, cleanup</b><span>Co-written guides; storage sorted</span></div>
+        <div class="step pending"><b>Expiry alert</b><span>Built and tested; not launched before I left</span></div>
+      </div>
+    </div>
+    <div id="table-tools"></div>
+  </div>
+
+  <details class="sql">
+    <summary>Logic behind the expiry alert <span>· simplified Python sketch, built and tested</span></summary>
+<pre><code><span class="c"># Weekly reminder: chemicals expiring in the next 30 days, grouped by owner.</span>
+<span class="c"># Built and tested against the inventory system's API; not launched before I left.</span>
+import datetime as dt
+from itertools import groupby
+import requests
+
+cutoff = dt.date.today() + dt.timedelta(days=30)
+items = requests.get(f"{API_BASE}/inventory", headers=AUTH, timeout=30).json()
+
+expiring = sorted(
+    (i for i in items
+     if i["status"] == "active" and dt.date.fromisoformat(i["expiry_date"]) &lt;= cutoff),
+    key=lambda i: i["owner_email"],
+)
+for owner, group in groupby(expiring, key=lambda i: i["owner_email"]):
+    rows = [(i["name"], i["location"], i["expiry_date"]) for i in group]
+    send_email(to=owner, subject=f"{len(rows)} chemicals expire within 30 days", rows=rows)</code></pre>
+  </details>
+  <div class="chips"><span class="chip">Voice of the customer</span><span class="chip">Survey analysis</span><span class="chip">Impact / effort prioritization</span><span class="chip">Working group lead</span><span class="chip">User adoption</span><span class="chip">Python + REST API</span></div>
+</div></section>
+
+<section><div class="wrap sec">
+  <h2>Real outcome</h2>
+  <div class="outcomes">
+    <div class="oc"><b>Station in use</b><span>Set up and used by the team before I left.</span></div>
+    <div class="oc"><b>Audit-ready records</b><span>Chemicals labeled and logged the way the system expects.</span></div>
+    <div class="oc"><b>Users first</b><span>The survey pointed to a physical fix. More training wouldn't have solved it.</span></div>
+  </div>
+</div></section>
+
+<section><div class="wrap sec">
+  <nav class="pager" aria-label="More dashboards">
+    <a href="rework-spc.html"><small>Previous dashboard</small><strong>← Rework control charts</strong></a>
+    <a class="next" href="pm-cal-compliance.html"><small>Next dashboard</small><strong>PM and calibration compliance →</strong></a>
+  </nav>
+</div></section>
+
+<footer><div class="wrap">Melody Yang · Irvine, California · All figures on this page are synthetic unless marked as real outcome.</div></footer>
+
+<script src="viz.js"></script>
+<script>
+(function () {
+  const C = { s1: VZ.css("--s1"), s2: VZ.css("--s2"), s3: VZ.css("--s3"), s4: VZ.css("--s4"), ink: VZ.css("--ink") };
+  const N = 38;   // synthetic respondents
+  const PAIN = [
+    { label: "Don't know how to use it", n: 27 },
+    { label: "Can't find labels or scanner", n: 24 },
+    { label: "Don't know where things go", n: 21 },
+    { label: "Takes too long", n: 12 },
+    { label: "Safety labels not at hand", n: 9 },
+    { label: "Other", n: 4 }
+  ];
+  const FIXES = [
+    { name: "Scanning station", effort: 2.2, impact: 4.6, chosen: true },
+    { name: "User guides", effort: 2.0, impact: 3.4, chosen: true },
+    { name: "Hands-on training", effort: 2.8, impact: 3.0, chosen: true },
+    { name: "Storage cleanup", effort: 3.4, impact: 3.6, chosen: true },
+    { name: "Expiry alert", effort: 3.1, impact: 2.2, chosen: false },
+    { name: "Replace the system", effort: 4.7, impact: 3.9, chosen: false }
+  ];
+  // weekly usage: low and flat, then a step up after the station goes live (week 13)
+  const r = VZ.rng(4417), W = 26, LIVE = 12, weeks = [], logged = [];
+  for (let i = 0; i < W; i++) {
+    const base = i < LIVE ? 9 : 9 + 34 * (1 - Math.exp(-(i - LIVE + 1) / 2.2));
+    weeks.push("Wk " + (i + 1)); logged.push(Math.max(0, Math.round(base * (1 + 0.14 * VZ.gauss(r)))));
+  }
+
+  function tiles() {
+    const el = document.getElementById("tiles"); el.innerHTML = "";
+    const pre = VZ.sum(logged.slice(0, LIVE)) / LIVE, post = VZ.sum(logged.slice(-6)) / 6;
+    [["Survey responses", String(N), "Synthetic count"],
+     ["Top issue", VZ.pct(PAIN[0].n / N), "Didn't know how to use it"],
+     ["Items logged / week", VZ.fmt(pre) + " → " + VZ.fmt(post), "Before vs the last 6 weeks"],
+     ["Fixes shipped", "4 of 6", "Expiry alert built, not launched"]].forEach(function (t) {
+      const d = VZ.h("div", "tile", el); VZ.h("div", "k", d, t[0]); VZ.h("div", "v", d, t[1]); VZ.h("div", "d", d, t[2]);
+    });
+  }
+
+  function matrix(el) {
+    el.innerHTML = "";
+    const W0 = Math.max(260, el.clientWidth || 500), H = 270;
+    const svg = VZ.s("svg", { viewBox: "0 0 " + W0 + " " + H, role: "img" }, el);
+    svg.setAttribute("aria-label", el.dataset.label); svg.style.width = "100%"; svg.style.height = "auto";
+    const m = { t: 10, r: 14, b: 34, l: 40 }, pw = W0 - m.l - m.r, ph = H - m.t - m.b;
+    const X = (v) => m.l + ((v - 1) / 4) * pw, Y = (v) => m.t + ph - ((v - 1) / 4) * ph;
+    // quadrant guide at the midpoint
+    VZ.s("rect", { x: m.l, y: m.t, width: pw / 2, height: ph / 2, fill: "#F3FAF8" }, svg);
+    VZ.txt(svg, m.l + 8, m.t + 16, "Do first", "lb2");
+    [1, 2, 3, 4, 5].forEach(function (v) {
+      VZ.s("line", { x1: m.l, x2: m.l + pw, y1: Y(v), y2: Y(v), class: v === 1 ? "baseline" : "gridline" }, svg);
+      VZ.s("line", { y1: m.t, y2: m.t + ph, x1: X(v), x2: X(v), class: v === 1 ? "baseline" : "gridline" }, svg);
+      VZ.txt(svg, m.l - 8, Y(v) + 4, String(v), "ax", { "text-anchor": "end" });
+      VZ.txt(svg, X(v), H - 18, String(v), "ax", { "text-anchor": "middle" });
+    });
+    VZ.txt(svg, m.l + pw / 2, H - 3, "Effort →", "ax", { "text-anchor": "middle" });
+    VZ.txt(svg, 10, m.t + ph / 2, "Impact →", "ax", { "text-anchor": "middle", transform: "rotate(-90 10 " + (m.t + ph / 2) + ")" });
+    FIXES.forEach(function (f) {
+      const cx = X(f.effort), cy = Y(f.impact), col = f.chosen ? C.s1 : "#B8AD9A";
+      VZ.s("circle", { cx: cx, cy: cy, r: 6, fill: col, stroke: "#fff", "stroke-width": 2 }, svg);
+      const right = cx < m.l + pw - 120;
+      VZ.txt(svg, cx + (right ? 10 : -10), cy + 4, f.name, "lb", { "text-anchor": right ? "start" : "end" });
+      const hit = VZ.s("circle", { cx: cx, cy: cy, r: 16, fill: "transparent" }, svg);
+      VZ.bindMark(hit, () => ({ title: f.name, rows: [
+        { label: "Impact", value: f.impact.toFixed(1) + " / 5", color: col },
+        { label: "Effort", value: f.effort.toFixed(1) + " / 5" },
+        { label: "Status", value: f.chosen ? "Shipped" : (f.name === "Expiry alert" ? "Built, not launched" : "Not pursued") }] }));
+    });
+  }
+
+  function render() {
+    tiles();
+    VZ.hbar(document.getElementById("pain"), {
+      data: PAIN.map((p) => ({ label: p.label, value: p.n / N, tip: { title: p.label, rows: [
+        { label: "Share of respondents", value: VZ.pct(p.n / N), color: C.s1 }, { label: "Respondents", value: p.n + " of " + N }] } })),
+      color: C.s1, fmt: (v) => VZ.pct(v), max: 1, rowH: 32, labelW: Math.min(190, Math.round(document.getElementById("pain").clientWidth * 0.5))
+    });
+    matrix(document.getElementById("matrix"));
+    VZ.line(document.getElementById("usage"), { labels: weeks, height: 220, tickEvery: 3, yMin: 0, area: true,
+      series: [{ name: "Items logged", color: C.s1, values: logged }], marks: [{ i: LIVE, label: "Station live" }] });
+  }
+  VZ.tableTools(document.getElementById("table-tools"), function () {
+    return { cols: [{ key: "label", label: "Issue" }, { key: "n", label: "Respondents", num: 1 }, { key: "share", label: "Share", num: 1 }],
+      rows: PAIN.map((p) => ({ label: p.label, n: p.n, share: (p.n / N).toFixed(3) })) };
+  }, "inventory-survey-synthetic.csv");
+  VZ.mount(render);
+})();
+</script>
+</body>
+</html>

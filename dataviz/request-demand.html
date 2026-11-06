@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Request Demand Dashboard | Melody Yang</title>
+<meta name="description" content="Interactive dashboard of monthly request demand across 4 operations functions, rebuilt with synthetic data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="viz.css">
+</head>
+<body>
+
+<div class="top">
+  <div class="topbar"><div class="wrap">
+    <a class="mark" href="../index.html">Melody Yang</a>
+    <nav class="topnav" aria-label="Site">
+      <a href="../index.html#work">Work</a>
+      <a href="../index.html#dataviz">Data viz</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </div></div>
+  <header class="page-head"><div class="wrap">
+    <p class="crumb"><a href="../index.html#dataviz">Data visualization</a> · BI dashboards</p>
+    <h1>Request demand across 4 teams</h1>
+    <p class="lede">I supported 4 teams that each tracked requests in their own spreadsheet. Whenever leadership asked how much work was coming in, it took days to pull together. This dashboard fixed that.</p>
+    <dl class="meta">
+      <div><dt>Built originally in</dt><dd>Power BI · Smartsheet API · Python</dd></div>
+      <div><dt>Rebuilt here in</dt><dd>HTML, SVG, plain JavaScript</dd></div>
+      <div><dt>Grain</dt><dd>1 row per request</dd></div>
+    </dl>
+    <p class="notice"><b>Synthetic data.</b> Same structure as the dashboard I built, with made-up numbers.</p>
+  </div></header>
+</div>
+
+<section><div class="wrap sec">
+  <h2>The story</h2>
+  <dl class="rows">
+    <dt>Problem</dt>
+    <dd>Monthly reports meant exporting 4 sheets and combining them by hand. It took 2 to 5 days, and the numbers didn't always match.</dd>
+    <dt>What I did</dt>
+    <dd>First I got all 4 teams on the same request form, so the data lined up. Then I set up an automatic refresh into one data model and built the dashboard on top of it.</dd>
+    <dt>What changed</dt>
+    <dd>Reports went from days to under an hour. Ad hoc requests dropped about 40%, because people could just check the dashboard instead of asking me.</dd>
+  </dl>
+</div></section>
+
+<section><div class="wrap sec">
+  <h2>Dashboard</h2>
+  <div class="dash" id="dash">
+    <div class="dash-title"><h3>Request demand · 4 functions</h3><span>Hover or tab through any chart for values</span></div>
+    <div class="filters">
+      <div class="filter"><span class="flabel" id="fy">Year</span><div class="seg" id="f-year" role="group" aria-labelledby="fy"></div></div>
+      <div class="filter"><span class="flabel" id="ff">Function</span><div class="seg" id="f-func" role="group" aria-labelledby="ff"></div></div>
+      <div class="filter"><label for="f-bu">Business unit</label><select class="sel" id="f-bu"></select></div>
+    </div>
+    <div class="tiles" id="tiles"></div>
+    <div class="card">
+      <h4>Monthly requests</h4>
+      <p class="sub" id="trend-sub">By function</p>
+      <div class="legend" id="trend-legend"></div>
+      <div class="chart" id="trend" data-label="Line chart of monthly requests by function"></div>
+    </div>
+    <div class="grid2 even">
+      <div class="card">
+        <h4>Requests by business unit</h4>
+        <p class="sub">Ranked, current filter</p>
+        <div class="chart" id="bu" data-label="Bar chart of requests by business unit"></div>
+      </div>
+      <div class="card">
+        <h4>Who's asking</h4>
+        <p class="sub">Requesting team share, by function</p>
+        <div class="legend" id="team-legend"></div>
+        <div class="chart" id="team" data-label="Stacked bar chart of requesting team share by function"></div>
+      </div>
+    </div>
+    <div id="table-tools"></div>
+  </div>
+
+  <details class="sql">
+    <summary>Query behind the monthly view <span>· BigQuery-style SQL over the star schema</span></summary>
+<pre><code>-- One row per month x function: feeds the trend line, tiles, and table view
+SELECT
+  DATE_TRUNC(r.submitted_date, MONTH)                         AS month,
+  f.function_name,
+  COUNT(*)                                                    AS requests,
+  SUM(r.quantity)                                             AS units,
+  APPROX_QUANTILES(                                           -- approximate median
+    DATE_DIFF(r.completed_date, r.submitted_date, DAY), 2
+  )[OFFSET(1)]                                                AS median_turnaround_days,
+  AVG(IF(r.completed_date &lt;= r.needed_by_date, 1, 0))        AS on_time_rate
+FROM fact_request AS r
+JOIN dim_function      AS f USING (function_id)
+JOIN dim_business_unit AS b USING (business_unit_id)
+WHERE r.status = 'Complete'
+  AND (@business_unit IS NULL OR b.business_unit_name = @business_unit)
+GROUP BY month, f.function_name
+ORDER BY month, f.function_name;</code></pre>
+  </details>
+  <div class="chips"><span class="chip">Power BI</span><span class="chip">Star schema</span><span class="chip">DAX / Power Query</span><span class="chip">ETL with scheduled refresh</span><span class="chip">Smartsheet API</span><span class="chip">KPI standardization</span></div>
+</div></section>
+
+<section><div class="wrap sec">
+  <h2>Real outcome</h2>
+  <div class="outcomes">
+    <div class="oc"><b>2–5 days → under 1 hour</b><span>Reporting turnaround. The data refreshes on its own, so the only manual step left is formatting.</span></div>
+    <div class="oc"><b>~40%</b><span>Fewer recurring ad hoc report requests, because people could check the dashboard themselves.</span></div>
+    <div class="oc"><b>6K+ records</b><span>Historical requests from 4 functions in one model, with the same KPI definitions for everyone.</span></div>
+  </div>
+</div></section>
+
+<section><div class="wrap sec">
+  <nav class="pager" aria-label="More dashboards">
+    <a href="../index.html#dataviz"><small>Back to</small><strong>All data visualization</strong></a>
+    <a class="next" href="access-governance.html"><small>Next dashboard</small><strong>Access program metrics →</strong></a>
+  </nav>
+</div></section>
+
+<footer><div class="wrap">Melody Yang · Irvine, California · All figures on this page are synthetic.</div></footer>
+
+<script src="viz.js"></script>
+<script>
+(function () {
+  const C = { s1: VZ.css("--s1"), s2: VZ.css("--s2"), s3: VZ.css("--s3"), s4: VZ.css("--s4") };
+  const FUNCS = [
+    { name: "Processing", base: 26, g: 0.10, smp: 55, tat: 3, team: [0.60, 0.30, 0.10], bu: [0.40, 0.27, 0.19, 0.14], color: C.s1 },
+    { name: "Testing",           base: 15, g: 0.20, smp: 24, tat: 4, team: [0.50, 0.42, 0.08], bu: [0.34, 0.30, 0.20, 0.16], color: C.s2 },
+    { name: "Analysis",base: 12, g: 0.15, smp: 18, tat: 6, team: [0.70, 0.25, 0.05], bu: [0.36, 0.24, 0.24, 0.16], color: C.s3 },
+    { name: "Support services",  base: 8,  g: 0.12, smp: 10, tat: 5, team: [0.80, 0.12, 0.08], bu: [0.42, 0.22, 0.18, 0.18], color: C.s4 }
+  ];
+  const BUS = ["Business unit A", "Business unit B", "Business unit C", "Business unit D"];
+  const TEAMS = ["R&D", "Manufacturing / Ops", "Marketing"];
+  const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const YEARS = [2022, 2023, 2024, 2025];
+  const months = [];
+  YEARS.forEach((y) => MON.forEach((m, i) => months.push({ y: y, mi: i, label: m + " " + String(y).slice(2) })));
+
+  // ---- synthetic request-level data, fixed seed ----
+  const r = VZ.rng(20240611);
+  const pick = (w) => { let u = r(), a = 0; for (let i = 0; i < w.length; i++) { a += w[i]; if (u <= a) return i; } return w.length - 1; };
+  const recs = [];
+  months.forEach(function (mo, idx) {
+    const yrs = idx / 12;
+    const season = (mo.mi === 11 ? 0.72 : 1) * (1 + 0.10 * Math.sin((2 * Math.PI * (mo.mi - 2)) / 12));
+    FUNCS.forEach(function (f, fi) {
+      const n = Math.max(0, Math.round(f.base * Math.pow(1 + f.g, yrs) * season * (1 + 0.09 * VZ.gauss(r))));
+      for (let k = 0; k < n; k++) {
+        const tat = Math.max(1, Math.round(f.tat * Math.pow(0.93, yrs) * Math.exp(0.42 * VZ.gauss(r))));
+        recs.push({ m: idx, f: fi, bu: pick(f.bu), team: pick(f.team),
+          samples: Math.max(1, Math.round(f.smp * Math.exp(0.5 * VZ.gauss(r)))),
+          tat: tat, onTime: tat <= Math.ceil(f.tat * 1.7) ? 1 : 0 });
+      }
+    });
+  });
+
+  const state = { year: "all", func: "all", bu: "all" };
+  VZ.seg(document.getElementById("f-year"), [{ label: "All", value: "all" }].concat(YEARS.map((y) => ({ label: String(y), value: y }))), "all", (v) => { state.year = v; render(); });
+  VZ.seg(document.getElementById("f-func"), [{ label: "All", value: "all" }].concat(FUNCS.map((f, i) => ({ label: f.name, value: i }))), "all", (v) => { state.func = v; render(); });
+  const sel = document.getElementById("f-bu");
+  ["all"].concat(BUS).forEach(function (b, i) { const o = document.createElement("option"); o.value = i === 0 ? "all" : i - 1; o.textContent = i === 0 ? "All business units" : b; sel.appendChild(o); });
+  sel.addEventListener("change", () => { state.bu = sel.value === "all" ? "all" : +sel.value; render(); });
+
+  function inYear(m) { return state.year === "all" || months[m].y === state.year; }
+  function filtered(ignoreFunc) {
+    return recs.filter((d) => inYear(d.m) && (ignoreFunc || state.func === "all" || d.f === state.func) && (state.bu === "all" || d.bu === state.bu));
+  }
+  function monthIdx() { return months.map((m, i) => i).filter(inYear); }
+
+  function tiles(rows) {
+    const el = document.getElementById("tiles"); el.innerHTML = "";
+    const prevYear = state.year === "all" ? null : state.year - 1;
+    let prev = null;
+    if (prevYear && YEARS.indexOf(prevYear) >= 0) prev = recs.filter((d) => months[d.m].y === prevYear && (state.func === "all" || d.f === state.func) && (state.bu === "all" || d.bu === state.bu));
+    const req = rows.length, smp = VZ.sum(rows.map((d) => d.samples));
+    const med = VZ.median(rows.map((d) => d.tat)), ot = rows.length ? VZ.sum(rows.map((d) => d.onTime)) / rows.length : 0;
+    const delta = (a, b) => (b ? (a >= b ? "+" : "−") + VZ.fmt(Math.abs((a / b - 1) * 100)) + "% vs " + prevYear : (state.year === "all" ? "2022 to 2025" : "First year in data"));
+    [["Requests", VZ.fmt(req), prev ? delta(req, prev.length) : delta(0, 0)],
+     ["Units requested", VZ.fmt(smp), prev ? delta(smp, VZ.sum(prev.map((d) => d.samples))) : delta(0, 0)],
+     ["Median turnaround", VZ.fmt(med, med % 1 ? 1 : 0) + " days", "Submit to complete"],
+     ["On-time delivery", VZ.pct(ot), "Completed by needed-by date"]].forEach(function (t) {
+      const d = VZ.h("div", "tile", el); VZ.h("div", "k", d, t[0]); VZ.h("div", "v", d, t[1]); VZ.h("div", "d", d, t[2]);
+    });
+  }
+
+  function render() {
+    const rows = filtered(false), mi = monthIdx();
+    tiles(rows);
+    // trend
+    const fl = state.func === "all" ? FUNCS.map((f, i) => i) : [state.func];
+    const series = fl.map(function (fi) {
+      const counts = mi.map(() => 0);
+      rows.forEach((d) => { if (d.f === fi) counts[mi.indexOf(d.m)]++; });
+      return { name: FUNCS[fi].name, color: FUNCS[fi].color, values: counts };
+    });
+    document.getElementById("trend-sub").textContent = (state.func === "all" ? "By function" : FUNCS[state.func].name) + (state.bu === "all" ? ", all business units" : ", " + BUS[state.bu]);
+    const lg = document.getElementById("trend-legend");
+    if (series.length > 1) VZ.legend(lg, series, "line"); else lg.innerHTML = "";
+    VZ.line(document.getElementById("trend"), {
+      labels: mi.map((i) => months[i].label), series: series, height: 270, area: series.length === 1,
+      tickEvery: mi.length > 12 ? 6 : 2,
+      extraTip: series.length > 1 ? (i) => [{ label: "Total", value: VZ.fmt(VZ.sum(series.map((s) => s.values[i]))) }] : null
+    });
+    // BU ranked
+    // keeps all 4 units on screen; the selected one stays in color, the rest go gray
+    const buRows = recs.filter((d) => inYear(d.m) && (state.func === "all" || d.f === state.func));
+    const buData = BUS.map((b, i) => ({ label: b.replace("Business unit ", "BU "), value: buRows.filter((d) => d.bu === i).length,
+      color: state.bu === "all" || state.bu === i ? C.s1 : "#D8CFBF" }))
+      .sort((a, b) => b.value - a.value);
+    VZ.hbar(document.getElementById("bu"), { data: buData, color: C.s1, valueName: "Requests", rowH: 34, labelW: 70 });
+    // team mix (ignores the function filter so the rows stay comparable; highlights the chosen one)
+    const tr = filtered(true);
+    const tseries = TEAMS.map((t, i) => ({ name: t, color: [C.s1, C.s2, C.s3][i] }));
+    VZ.legend(document.getElementById("team-legend"), tseries, "rect");
+    VZ.stackH(document.getElementById("team"), {
+      percent: true, series: tseries, rowH: 34, labelW: 118,
+      rows: FUNCS.map((f, fi) => ({ label: f.name, values: TEAMS.map((t, ti) => tr.filter((d) => d.f === fi && d.team === ti).length) }))
+        .filter((row, fi) => state.func === "all" || fi === state.func)
+    });
+    refreshTable();
+  }
+
+  function tableData() {
+    const rows = filtered(false), out = [];
+    monthIdx().forEach(function (m) {
+      FUNCS.forEach(function (f, fi) {
+        const g = rows.filter((d) => d.m === m && d.f === fi);
+        if (!g.length) return;
+        out.push({ month: months[m].y + "-" + String(months[m].mi + 1).padStart(2, "0"), func: f.name, req: g.length,
+          smp: VZ.sum(g.map((d) => d.samples)), tat: VZ.median(g.map((d) => d.tat)), ot: (VZ.sum(g.map((d) => d.onTime)) / g.length).toFixed(3) });
+      });
+    });
+    return { cols: [{ key: "month", label: "Month" }, { key: "func", label: "Function" }, { key: "req", label: "Requests", num: 1 },
+      { key: "smp", label: "Units", num: 1 }, { key: "tat", label: "Median turnaround (days)", num: 1 }, { key: "ot", label: "On-time rate", num: 1 }], rows: out };
+  }
+  const refreshTable = VZ.tableTools(document.getElementById("table-tools"), tableData, "request-demand-synthetic.csv");
+  VZ.mount(render);
+})();
+</script>
+</body>
+</html>

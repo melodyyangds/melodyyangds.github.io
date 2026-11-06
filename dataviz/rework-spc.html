@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rework Control Charts | Melody Yang</title>
+<meta name="description" content="P-chart, I-chart, and before/after Pareto from a Lean Six Sigma Green Belt rework project, rebuilt with synthetic data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="viz.css">
+</head>
+<body>
+
+<div class="top">
+  <div class="topbar"><div class="wrap">
+    <a class="mark" href="../index.html">Melody Yang</a>
+    <nav class="topnav" aria-label="Site">
+      <a href="../index.html#work">Work</a>
+      <a href="../index.html#dataviz">Data viz</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </div></div>
+  <header class="page-head"><div class="wrap">
+    <p class="crumb"><a href="../index.html#dataviz">Data visualization</a> · Process improvement</p>
+    <h1>Finding the real causes of rework</h1>
+    <p class="lede">Everyone had a theory about where our rework came from. For my Green Belt project, I tracked the cause of every reworked order so we could fix the right thing.</p>
+    <dl class="meta">
+      <div><dt>Method</dt><dd>Lean Six Sigma Green Belt · DMAIC</dd></div>
+      <div><dt>Charts</dt><dd>P-chart · I-chart · Pareto</dd></div>
+      <div><dt>Grain</dt><dd>1 row per reviewed work order</dd></div>
+    </dl>
+    <p class="notice"><b>Synthetic data.</b> Same methods and chart types as the real project, with made-up numbers.</p>
+  </div></header>
+</div>
+
+<section><div class="wrap sec">
+  <h2>The story</h2>
+  <dl class="rows">
+    <dt>Problem</dt>
+    <dd>Rework was eating up a lot of the team's time. Past fixes went after the step people assumed was the problem, and nothing changed.</dd>
+    <dt>What I did</dt>
+    <dd>I ran a full DMAIC project. The key part was tagging every reworked order with a cause, so the Pareto came from real records instead of opinions. Control charts showed whether the process was stable before the change and whether the improvement stuck.</dd>
+    <dt>What changed</dt>
+    <dd>Most of the rework came from a few gaps in the process, not careless people. We closed them with digital forms, barcode scanning, a data logger, and fewer approval steps. It saved about $90K a year. (The cause names on this page are examples.)</dd>
+  </dl>
+</div></section>
+
+<section><div class="wrap sec">
+  <h2>Dashboard</h2>
+  <div class="dash">
+    <div class="dash-title"><h3>Rework rate · 30 weeks before and after the fixes</h3><span>Hover or tab through any chart for values</span></div>
+    <div class="tiles" id="tiles"></div>
+    <div class="card">
+      <h4>P-chart: share of reviewed orders needing rework</h4>
+      <p class="sub">Weekly. Limits recalculated per phase and widen when fewer orders were reviewed. <span class="st crit">● out of control</span></p>
+      <div class="chart" id="pchart" data-label="P-chart of weekly rework proportion before and after the process changes"></div>
+    </div>
+    <div class="grid2 even">
+      <div class="card">
+        <h4>Pareto: before</h4>
+        <p class="sub">Share of rework by cause, weeks 1 to 30</p>
+        <div class="chart" id="pareto-before" data-label="Pareto chart of rework causes before the fixes"></div>
+      </div>
+      <div class="card">
+        <h4>Pareto: after</h4>
+        <p class="sub">Share of rework by cause, weeks 31 to 60</p>
+        <div class="chart" id="pareto-after" data-label="Pareto chart of rework causes after the fixes"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h4>I-chart: rework hours per week</h4>
+      <p class="sub">Individuals chart, limits from the average moving range (2.66 × MR̄)</p>
+      <div class="chart" id="ichart" data-label="Individuals chart of weekly rework hours"></div>
+    </div>
+    <div id="table-tools"></div>
+  </div>
+
+  <details class="sql">
+    <summary>Query behind the P-chart <span>· BigQuery-style SQL, limits computed per phase</span></summary>
+<pre><code>WITH weekly AS (
+  SELECT
+    DATE_TRUNC(review_date, WEEK(MONDAY))                  AS week,
+    IF(DATE_TRUNC(review_date, WEEK(MONDAY)) &gt;= @change_week,
+       'after', 'before')                                  AS phase,  -- by week, so no week splits
+    COUNT(*)                                               AS orders_reviewed,
+    COUNTIF(needs_rework)                                  AS rework_orders
+  FROM work_order_review
+  GROUP BY week, phase
+),
+phase_rate AS (
+  SELECT phase, SUM(rework_orders) / SUM(orders_reviewed) AS p_bar
+  FROM weekly
+  GROUP BY phase
+)
+SELECT
+  w.week, w.phase, w.orders_reviewed,
+  SAFE_DIVIDE(w.rework_orders, w.orders_reviewed)         AS p,
+  pr.p_bar                                                AS center_line,
+  pr.p_bar + 3 * SQRT(pr.p_bar * (1 - pr.p_bar) / w.orders_reviewed)            AS ucl,
+  GREATEST(0, pr.p_bar - 3 * SQRT(pr.p_bar * (1 - pr.p_bar) / w.orders_reviewed)) AS lcl
+FROM weekly AS w
+JOIN phase_rate AS pr USING (phase)
+ORDER BY w.week;</code></pre>
+  </details>
+  <div class="chips"><span class="chip">DMAIC</span><span class="chip">P-chart</span><span class="chip">I-MR chart</span><span class="chip">Pareto analysis</span><span class="chip">Fishbone</span><span class="chip">FMEA</span><span class="chip">Statistics (B.S., UC Davis)</span></div>
+</div></section>
+
+<section><div class="wrap sec">
+  <h2>Real outcome</h2>
+  <div class="outcomes">
+    <div class="oc"><b>~$90K / year</b><span>Documented annual savings from the Green Belt project.</span></div>
+    <div class="oc"><b>7 process fixes</b><span>Smartsheet intake tracking, digital work orders, barcode scanning, QR codes on tools and materials, a data logger, simpler steps, fewer approvals.</span></div>
+    <div class="oc"><b>Fewer chances for error</b><span>Each fix took a manual step out of the process instead of adding another review.</span></div>
+  </div>
+</div></section>
+
+<section><div class="wrap sec">
+  <nav class="pager" aria-label="More dashboards">
+    <a href="access-governance.html"><small>Previous dashboard</small><strong>← Access program metrics</strong></a>
+    <a class="next" href="inventory-adoption.html"><small>Next dashboard</small><strong>Inventory system adoption →</strong></a>
+  </nav>
+</div></section>
+
+<footer><div class="wrap">Melody Yang · Irvine, California · All figures on this page are synthetic.</div></footer>
+
+<script src="viz.js"></script>
+<script>
+(function () {
+  const C = { s1: VZ.css("--s1"), s2: VZ.css("--s2"), s3: VZ.css("--s3"), s4: VZ.css("--s4") };
+  const CAUSES = [
+    { name: "Incomplete request", fix: "Structured intake form" },
+    { name: "Transcription error", fix: "Barcode and QR scanning, digital work orders" },
+    { name: "Waiting on approval", fix: "Removed unneeded approvals" },
+    { name: "Extra handoff step", fix: "Simplified process steps" },
+    { name: "Temp log gap", fix: "Data logger" },
+    { name: "Other", fix: "Monitored" }
+  ];
+  const WB = [0.38, 0.27, 0.14, 0.09, 0.07, 0.05], WA = [0.27, 0.21, 0.07, 0.19, 0.12, 0.14];
+  const N = 60, PHASE = 30, r = VZ.rng(86021);
+  const weeks = [];
+  for (let i = 0; i < N; i++) {
+    const after = i >= PHASE, n = 18 + Math.floor(r() * 14);
+    let p = after ? 0.045 : 0.12;
+    if (i === 11) p = 0.36;                 // one special-cause week in the baseline
+    let k = 0; const causes = [0, 0, 0, 0, 0, 0];
+    for (let j = 0; j < n; j++) if (r() < p) {
+      k++; const w = after ? WA : WB; let u = r(), a = 0, c = 0;
+      for (; c < w.length; c++) { a += w[c]; if (u <= a) break; }
+      causes[Math.min(c, 5)]++;
+    }
+    const hrs = Math.max(0, k * (3.4 + 0.5 * VZ.gauss(r)) + (after ? 0.6 : 1.2) * VZ.gauss(r));
+    weeks.push({ i: i, label: "Wk " + (i + 1), phase: after ? "after" : "before", n: n, k: k, p: k / n, causes: causes, hrs: Math.round(hrs * 10) / 10 });
+  }
+  // P-chart limits per phase
+  ["before", "after"].forEach(function (ph) {
+    const g = weeks.filter((w) => w.phase === ph), pb = VZ.sum(g.map((w) => w.k)) / VZ.sum(g.map((w) => w.n));
+    g.forEach(function (w) { const sd = Math.sqrt((pb * (1 - pb)) / w.n); w.cl = pb; w.ucl = pb + 3 * sd; w.lcl = Math.max(0, pb - 3 * sd); });
+    // I-chart limits from moving range within the phase
+    const mr = []; for (let j = 1; j < g.length; j++) mr.push(Math.abs(g[j].hrs - g[j - 1].hrs));
+    const mrb = VZ.sum(mr) / mr.length, xb = VZ.sum(g.map((w) => w.hrs)) / g.length;
+    g.forEach(function (w, j) { w.mr = j ? Math.abs(w.hrs - g[j - 1].hrs) : null; w.icl = xb; w.iucl = xb + 2.66 * mrb; w.ilcl = Math.max(0, xb - 2.66 * mrb); });
+  });
+
+  function phaseStats(ph) {
+    const g = weeks.filter((w) => w.phase === ph);
+    return { p: g[0].cl, hrs: VZ.sum(g.map((w) => w.hrs)) / g.length, signals: g.filter((w) => w.p > w.ucl).length,
+      causes: CAUSES.map((c, ci) => VZ.sum(g.map((w) => w.causes[ci]))) };
+  }
+  const B = phaseStats("before"), A = phaseStats("after");
+
+  function tiles() {
+    const el = document.getElementById("tiles"); el.innerHTML = "";
+    [["Rework rate, before", VZ.pct(B.p, 1), "Center line, weeks 1 to 30"],
+     ["Rework rate, after", VZ.pct(A.p, 1), "Center line, weeks 31 to 60"],
+     ["Relative reduction", VZ.pct(1 - A.p / B.p), "In the share of orders reworked"],
+     ["Rework hours / week", VZ.fmt(B.hrs, 1) + " → " + VZ.fmt(A.hrs, 1), "Average, before → after"]].forEach(function (t) {
+      const d = VZ.h("div", "tile", el); VZ.h("div", "k", d, t[0]); VZ.h("div", "v", d, t[1]); VZ.h("div", "d", d, t[2]);
+    });
+  }
+
+  function pareto(id, st) {
+    const tot = VZ.sum(st.causes);
+    const order = CAUSES.map((c, i) => i).sort((a, b) => st.causes[b] - st.causes[a]);
+    VZ.vbar(document.getElementById(id), {
+      labels: order.map((i) => CAUSES[i].name), values: order.map((i) => st.causes[i] / tot), percent: true,
+      color: C.s1, cumulative: true, threshold: 0.8, height: 250, valueName: "Share of rework",
+      extraTip: (j) => [{ label: "Orders", value: VZ.fmt(st.causes[order[j]]) }, { label: "Fix", value: CAUSES[order[j]].fix }]
+    });
+  }
+
+  function render() {
+    tiles();
+    VZ.control(document.getElementById("pchart"), {
+      labels: weeks.map((w) => w.label), values: weeks.map((w) => w.p), cl: weeks.map((w) => w.cl), ucl: weeks.map((w) => w.ucl), lcl: weeks.map((w) => w.lcl),
+      phaseAt: PHASE, phaseLabels: ["Before fixes", "After fixes"], color: C.s2, yFmt: (v) => VZ.pct(v), valueName: "Rework share", height: 270,
+      extraTip: (i) => [{ label: "Orders reviewed", value: VZ.fmt(weeks[i].n) }, { label: "Reworked", value: VZ.fmt(weeks[i].k) }]
+    });
+    pareto("pareto-before", B); pareto("pareto-after", A);
+    VZ.control(document.getElementById("ichart"), {
+      labels: weeks.map((w) => w.label), values: weeks.map((w) => w.hrs), cl: weeks.map((w) => w.icl), ucl: weeks.map((w) => w.iucl), lcl: weeks.map((w) => w.ilcl),
+      phaseAt: PHASE, phaseLabels: ["Before fixes", "After fixes"], color: C.s3, yFmt: (v) => VZ.fmt(v, 0) + " h", valueName: "Rework hours", height: 240,
+      extraTip: (i) => [{ label: "Moving range", value: weeks[i].mr == null ? "–" : VZ.fmt(weeks[i].mr, 1) + " h" }]
+    });
+  }
+  VZ.tableTools(document.getElementById("table-tools"), function () {
+    return { cols: [{ key: "label", label: "Week" }, { key: "phase", label: "Phase" }, { key: "n", label: "Orders reviewed", num: 1 }, { key: "k", label: "Reworked", num: 1 },
+      { key: "p", label: "p", num: 1, fmt: (v) => v.toFixed(3) }, { key: "cl", label: "CL", num: 1, fmt: (v) => v.toFixed(3) },
+      { key: "ucl", label: "UCL", num: 1, fmt: (v) => v.toFixed(3) }, { key: "lcl", label: "LCL", num: 1, fmt: (v) => v.toFixed(3) },
+      { key: "hrs", label: "Rework hours", num: 1 }], rows: weeks };
+  }, "rework-spc-synthetic.csv");
+  VZ.mount(render);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Access Program Metrics | Melody Yang</title>
+<meta name="description" content="Quarterly metrics dashboard for a controlled-access program across the US, Singapore, and Costa Rica, rebuilt with synthetic data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="viz.css">
+</head>
+<body>
+
+<div class="top">
+  <div class="topbar"><div class="wrap">
+    <a class="mark" href="../index.html">Melody Yang</a>
+    <nav class="topnav" aria-label="Site">
+      <a href="../index.html#work">Work</a>
+      <a href="../index.html#dataviz">Data viz</a>
+      <a href="../index.html#contact">Contact</a>
+    </nav>
+  </div></div>
+  <header class="page-head"><div class="wrap">
+    <p class="crumb"><a href="../index.html#dataviz">Data visualization</a> · BI dashboards</p>
+    <h1>Controlled-access program metrics</h1>
+    <p class="lede">A restricted program with users at 3 sites, and requests used to go through email. I started out supporting it and ended up running it until I left.</p>
+    <dl class="meta">
+      <div><dt>Built originally in</dt><dd>Power BI · digital intake forms</dd></div>
+      <div><dt>Sites</dt><dd>US · Singapore · Costa Rica</dd></div>
+      <div><dt>Grain</dt><dd>1 row per access event</dd></div>
+    </dl>
+    <p class="notice"><b>Synthetic data.</b> Generic categories, no program details, made-up numbers.</p>
+  </div></header>
+</div>
+
+<section><div class="wrap sec">
+  <h2>The story</h2>
+  <dl class="rows">
+    <dt>Problem</dt>
+    <dd>Every audit asked the same things: who has access, does each person still need it, and who approved it. Answering took about two weeks of digging through email.</dd>
+    <dt>What I did</dt>
+    <dd>I added eligibility questions to the request form, so incomplete requests got caught up front. I set clear rules for who gets which level of access by role. I reported usage every quarter, and later moved the training online and tracked completion in Power BI.</dd>
+    <dt>What changed</dt>
+    <dd>Requests got about 50% faster. Quarterly reviews made removing old access a normal step. Audit prep went from about two weeks to under a day.</dd>
+  </dl>
+</div></section>
+
+<section><div class="wrap sec">
+  <h2>Dashboard</h2>
+  <div class="dash">
+    <div class="dash-title"><h3>Controlled-access program · quarterly view</h3><span>Hover or tab through any chart for values</span></div>
+    <div class="filters">
+      <div class="filter"><span class="flabel" id="fs">Site</span><div class="seg" id="f-site" role="group" aria-labelledby="fs"></div></div>
+    </div>
+    <div class="tiles" id="tiles"></div>
+    <div class="card">
+      <h4>Active users</h4>
+      <p class="sub" id="users-sub">End of quarter, by site</p>
+      <div class="legend" id="users-legend"></div>
+      <div class="chart" id="users" data-label="Line chart of active users by site per quarter"></div>
+    </div>
+    <div class="grid2 even">
+      <div class="card">
+        <h4>Median request turnaround</h4>
+        <p class="sub">Days, submit to approved</p>
+        <div class="chart" id="tat" data-label="Line chart of median access request turnaround per quarter"></div>
+      </div>
+      <div class="card">
+        <h4>Access added vs removed</h4>
+        <p class="sub">Per quarter. Removals come from quarterly reviews.</p>
+        <div class="legend" id="chg-legend"></div>
+        <div class="chart" id="chg" data-label="Diverging bar chart of access added and removed per quarter"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h4>People in the program by function</h4>
+      <p class="sub" id="fn-sub">Latest quarter. Access level follows the role-based decision tree.</p>
+      <div class="legend" id="fn-legend"></div>
+      <div class="chart" id="fn" data-label="Stacked bar chart of program members by function and access level"></div>
+    </div>
+    <div id="table-tools"></div>
+  </div>
+
+  <details class="sql">
+    <summary>Query behind the quarterly view <span>· BigQuery-style SQL over an access event log</span></summary>
+<pre><code>-- access_events: every grant and removal since the program started
+-- requests: one row per access request
+WITH changes AS (
+  SELECT
+    site,
+    DATE_TRUNC(event_date, QUARTER)                AS quarter,   -- first day of the quarter
+    COUNTIF(event_type = 'granted')                AS added,
+    COUNTIF(event_type = 'removed')                AS removed
+  FROM access_events
+  GROUP BY site, quarter
+),
+turnaround AS (
+  SELECT
+    site,
+    DATE_TRUNC(approved_date, QUARTER)             AS quarter,
+    APPROX_QUANTILES(
+      DATE_DIFF(approved_date, submitted_date, DAY), 2
+    )[OFFSET(1)]                                   AS median_days
+  FROM requests
+  WHERE status = 'Approved'
+  GROUP BY site, quarter
+)
+SELECT
+  c.site, c.quarter, c.added, c.removed,
+  SUM(c.added - c.removed) OVER (
+    PARTITION BY c.site ORDER BY c.quarter
+  )                                                AS active_users,  -- running total from day 1
+  t.median_days
+FROM changes AS c
+LEFT JOIN turnaround AS t USING (site, quarter)
+ORDER BY c.site, c.quarter;</code></pre>
+  </details>
+  <div class="chips"><span class="chip">Power BI</span><span class="chip">Access governance</span><span class="chip">Least privilege</span><span class="chip">Requirements analysis</span><span class="chip">Multi-site rollout</span><span class="chip">Audit readiness</span></div>
+</div></section>
+
+<section><div class="wrap sec">
+  <h2>Real outcome</h2>
+  <div class="outcomes">
+    <div class="oc"><b>~50% faster</b><span>Access request turnaround after the intake redesign, across all 3 sites.</span></div>
+    <div class="oc"><b>2 weeks → under 1 day</b><span>Audit prep time, after I moved training completion records into a Power BI view.</span></div>
+    <div class="oc"><b>22,000+ employees</b><span>Matched to employee IDs and managers so the new training reached the right people.</span></div>
+  </div>
+</div></section>
+
+<section><div class="wrap sec">
+  <nav class="pager" aria-label="More dashboards">
+    <a href="request-demand.html"><small>Previous dashboard</small><strong>← Request demand</strong></a>
+    <a class="next" href="rework-spc.html"><small>Next dashboard</small><strong>Rework control charts →</strong></a>
+  </nav>
+</div></section>
+
+<footer><div class="wrap">Melody Yang · Irvine, California · All figures on this page are synthetic unless marked as real outcome.</div></footer>
+
+<script src="viz.js"></script>
+<script>
+(function () {
+  const C = { s1: VZ.css("--s1"), s2: VZ.css("--s2"), s3: VZ.css("--s3"), s4: VZ.css("--s4") };
+  const SITES = [
+    { name: "US", start: 140, add: 15, rm: 9, tat0: 9, tat1: 4.5, color: C.s1 },
+    { name: "Singapore", start: 34, add: 4.5, rm: 2.6, tat0: 11, tat1: 5, color: C.s2 },
+    { name: "Costa Rica", start: 22, add: 3.4, rm: 1.8, tat0: 12, tat1: 5.5, color: C.s3 }
+  ];
+  const Q = []; [2022, 2023, 2024, 2025].forEach((y) => [1, 2, 3, 4].forEach((q) => Q.push({ y: y, q: q, label: "Q" + q + " " + String(y).slice(2) })));
+  const REDESIGN = 4;   // Q1 2023: new intake forms go live
+  const REVIEWS = 5;    // quarterly access reviews start Q2 2023
+  const AUDIT = 6;      // Q3 2023 audit clean-up
+  const r = VZ.rng(7702);
+  const data = SITES.map(function (s) {
+    let act = s.start;
+    return Q.map(function (q, i) {
+      const added = Math.max(0, Math.round(s.add * (1 + 0.25 * VZ.gauss(r))));
+      let removed = i < REVIEWS ? Math.round(s.rm * 0.25 * (1 + 0.5 * r())) : Math.max(0, Math.round(s.rm * (1 + 0.3 * VZ.gauss(r))));
+      if (i === AUDIT) removed += Math.round(s.start * 0.24);
+      act = act + added - removed;
+      const t = i < REDESIGN ? s.tat0 : i < REDESIGN + 2 ? s.tat0 - (s.tat0 - s.tat1) * (i - REDESIGN + 1) / 3 : s.tat1;
+      return { added: added, removed: removed, active: act, tat: Math.round(Math.max(2, t * (1 + 0.08 * VZ.gauss(r))) * 2) / 2 };
+    });
+  });
+  const FUNCS = ["R&D", "Engineering", "Manufacturing", "Quality", "Regulatory affairs", "Support functions"];
+  const FSHARE = [0.30, 0.24, 0.18, 0.12, 0.06, 0.10];
+  const TIERS = [
+    { name: "Full access", color: C.s1 },
+    { name: "Project-limited access", color: C.s4 },
+    { name: "Awareness training only", color: C.s2 }
+  ];
+  const TMIX = [[0.55, 0.45, 0], [0.45, 0.55, 0], [0.2, 0.6, 0.2], [0.3, 0.5, 0.2], [0.1, 0.5, 0.4], [0, 0.08, 0.92]];
+
+  const state = { site: "all" };
+  VZ.seg(document.getElementById("f-site"), [{ label: "All sites", value: "all" }].concat(SITES.map((s, i) => ({ label: s.name, value: i }))), "all", (v) => { state.site = v; render(); });
+  const idx = () => (state.site === "all" ? SITES.map((s, i) => i) : [state.site]);
+  const agg = (key) => Q.map((q, qi) => VZ.sum(idx().map((si) => data[si][qi][key])));
+  // median turnaround for a combined scope: weight by requests (added) as an approximation
+  const aggTat = () => Q.map((q, qi) => { const ids = idx(); const w = ids.map((si) => data[si][qi].added || 1);
+    return Math.round((VZ.sum(ids.map((si, k) => data[si][qi].tat * w[k])) / VZ.sum(w)) * 2) / 2; });
+
+  function tiles() {
+    const el = document.getElementById("tiles"); el.innerHTML = "";
+    const act = agg("active"), tat = aggTat(), rem = agg("removed"), add = agg("added");
+    const t0 = VZ.sum(tat.slice(0, 4)) / 4, t1 = VZ.sum(tat.slice(-4)) / 4;
+    [["Active users", VZ.fmt(act[act.length - 1]), "End of Q4 2025"],
+     ["Median turnaround", VZ.fmt(t1, 1) + " days", "Last 4 quarters, down " + VZ.pct(1 - t1 / t0) + " vs the first 4"],
+     ["Removed at review", VZ.fmt(VZ.sum(rem.slice(REVIEWS))), "Since quarterly reviews began"],
+     ["Access granted", VZ.fmt(VZ.sum(add)), "2022 to 2025"]].forEach(function (t) {
+      const d = VZ.h("div", "tile", el); VZ.h("div", "k", d, t[0]); VZ.h("div", "v", d, t[1]); VZ.h("div", "d", d, t[2]);
+    });
+  }
+  function render() {
+    tiles();
+    const labels = Q.map((q) => q.label), ids = idx();
+    const us = ids.map((si) => ({ name: SITES[si].name, color: SITES[si].color, values: data[si].map((d) => d.active) }));
+    if (us.length > 1) VZ.legend(document.getElementById("users-legend"), us, "line"); else document.getElementById("users-legend").innerHTML = "";
+    document.getElementById("users-sub").textContent = state.site === "all" ? "End of quarter, by site" : "End of quarter, " + SITES[state.site].name;
+    VZ.line(document.getElementById("users"), { labels: labels, series: us, height: 250, tickEvery: 2, area: us.length === 1,
+      marks: [{ i: AUDIT, label: "Audit clean-up" }],
+      extraTip: us.length > 1 ? (i) => [{ label: "All sites", value: VZ.fmt(VZ.sum(us.map((s) => s.values[i]))) }] : null });
+    VZ.line(document.getElementById("tat"), { labels: labels, height: 220, tickEvery: 3, yMin: 0,
+      series: [{ name: "Median days", color: C.s3, values: aggTat() }], marks: [{ i: REDESIGN, label: "New intake" }],
+      yFmt: (v) => VZ.fmt(v, v % 1 ? 1 : 0) });
+    const chg = { pos: { name: "Added", color: C.s1, values: agg("added") }, neg: { name: "Removed", color: C.s2, values: agg("removed") } };
+    VZ.legend(document.getElementById("chg-legend"), [chg.pos, chg.neg], "rect");
+    VZ.diverge(document.getElementById("chg"), { labels: labels, pos: chg.pos, neg: chg.neg, height: 220 });
+    const last = VZ.sum(ids.map((si) => data[si][Q.length - 1].active));
+    // headcount by function and access level for the selected scope
+    const rows = FUNCS.map(function (f, fi) {
+      const base = last * 1.12 * FSHARE[fi];   // people per function; awareness-only sit outside active users
+      const v = TMIX[fi].map((t) => Math.round(base * t));
+      return { label: f, values: v };
+    });
+    VZ.legend(document.getElementById("fn-legend"), TIERS, "rect");
+    VZ.stackH(document.getElementById("fn"), { rows: rows, series: TIERS, rowH: 34, labelW: 130 });
+    refresh();
+  }
+  const refresh = VZ.tableTools(document.getElementById("table-tools"), function () {
+    const out = [];
+    idx().forEach((si) => Q.forEach((q, qi) => { const d = data[si][qi];
+      out.push({ q: q.y + "-Q" + q.q, site: SITES[si].name, added: d.added, removed: d.removed, active: d.active, tat: d.tat }); }));
+    return { cols: [{ key: "q", label: "Quarter" }, { key: "site", label: "Site" }, { key: "added", label: "Added", num: 1 },
+      { key: "removed", label: "Removed", num: 1 }, { key: "active", label: "Active users", num: 1 }, { key: "tat", label: "Median turnaround (days)", num: 1 }], rows: out };
+  }, "access-program-synthetic.csv");
+  VZ.mount(render);
+})();
+</script>
+</body>
+</html>
